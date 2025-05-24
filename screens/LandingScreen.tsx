@@ -10,6 +10,22 @@ export default function LandingScreen() {
       <Text style={styles.subtitle}>
         Find people. Share a meal. Make connections.
       </Text>
+
+      <View style={styles.buttonRow}>
+        <Pressable
+          style={[styles.button, styles.registerButton]}
+          onPress={() => navigation.navigate("Register")}
+        >
+          <Text style={styles.buttonText}>Register</Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.button, styles.loginButton]}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <Text style={styles.buttonText}>Login</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -33,11 +49,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: "center",
   },
+  buttonRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
   button: {
-    backgroundColor: "#ff7f50",
     paddingVertical: 12,
-    paddingHorizontal: 32,
+    paddingHorizontal: 24,
     borderRadius: 8,
+  },
+  registerButton: {
+    backgroundColor: "#007aff",
+    marginRight: 8,
+  },
+  loginButton: {
+    backgroundColor: "#28a745",
   },
   buttonText: {
     color: "#fff",

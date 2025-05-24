@@ -10,26 +10,26 @@ import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { dummyUsers } from "../data/dummyUsers";
 
-export default function RegisterScreen() {
+export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
-  const handleRegister = () => {
-    const existingUser = dummyUsers.find((u) => u.email === email);
+  const handleLogin = () => {
+    const user = dummyUsers.find(
+      (u) => u.email === email && u.password === password
+    );
 
-    if (existingUser) {
-      Alert.alert("Error", "This email is already registered");
+    if (user) {
+      navigation.navigate("Landing");
     } else {
-      dummyUsers.push({ email, password });
-      Alert.alert("Success", "Account created (simulated)");
-      navigation.navigate("Login");
+      Alert.alert("Login Failed", "Invalid email or password");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>Login</Text>
       <TextInput
         placeholder="Email"
         style={styles.input}
@@ -44,8 +44,8 @@ export default function RegisterScreen() {
         value={password}
         onChangeText={setPassword}
       />
-      <Pressable style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
+      <Pressable style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
       </Pressable>
     </View>
   );
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   button: {
-    backgroundColor: "#007aff",
+    backgroundColor: "#28a745",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
