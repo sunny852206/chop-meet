@@ -16,12 +16,14 @@ export default function LoginScreen() {
   const navigation = useNavigation();
 
   const handleLogin = () => {
+    // Check if user credentials match any dummy account
     const user = dummyUsers.find(
       (u) => u.email === email && u.password === password
     );
 
     if (user) {
-      navigation.navigate("Landing");
+      // Navigate to meal list on success
+      navigation.navigate("MealList");
     } else {
       Alert.alert("Login Failed", "Invalid email or password");
     }
