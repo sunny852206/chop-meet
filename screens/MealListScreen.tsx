@@ -5,25 +5,75 @@ import { useNavigation } from "@react-navigation/native";
 type Meal = {
   id: string;
   title: string;
+  mealType: "Meal Buddy" | "Open to More";
 };
 
 export default function MealListScreen() {
+  const [filter, setFilter] = useState<"Meal Buddy" | "Open to More">(
+    "Meal Buddy"
+  );
+
   const [meals, setMeals] = useState([
     // Initial dummy meal events
-    { id: "1", title: "🍲 Dollar Shop Hotpot @ Bellevue" },
-    { id: "2", title: "🍣 Sushi Kashiba Dinner Meetup" },
-    { id: "3", title: "🍔 Dick’s Drive-In Burger Night" },
-    { id: "4", title: "🥟 Din Tai Fung Xiao Long Bao Gathering" },
-    { id: "5", title: "🍜 Ramen Danbo Lunch" },
-    { id: "6", title: "🌮 Tacos Chukis Capitol Hill" },
+    {
+      id: "1",
+      title: "🍲 Dollar Shop Hotpot @ Bellevue",
+      mealType: "Meal Buddy",
+    },
+    {
+      id: "2",
+      title: "🍣 Sushi Kashiba Dinner Meetup",
+      mealType: "Open to More",
+    },
+    {
+      id: "3",
+      title: "🍔 Dick’s Drive-In Burger Night",
+      mealType: "Meal Buddy",
+    },
+    {
+      id: "4",
+      title: "🥟 Din Tai Fung Xiao Long Bao Gathering",
+      mealType: "Open to More",
+    },
+    { id: "5", title: "🍜 Ramen Danbo Lunch", mealType: "Meal Buddy" },
+    {
+      id: "6",
+      title: "🌮 Tacos Chukis Capitol Hill",
+      mealType: "Open to More",
+    },
   ]);
   const navigation = useNavigation();
+  const filteredMeals = meals.filter((meal) => meal.mealType === filter);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🍽️ Explore Meal Events</Text>
+
+      {/* Toggle filter */}
+      <View style={styles.toggleContainer}>
+        <Pressable
+          style={[
+            styles.toggleButton,
+            filter === "Meal Buddy" && styles.activeToggle,
+          ]}
+          onPress={() => setFilter("Meal Buddy")}
+        >
+          <Text>🍜 Meal Buddy</Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.toggleButton,
+            filter === "Open to More" && styles.activeToggle,
+          ]}
+          onPress={() => setFilter("Open to More")}
+        >
+          <Text>❤️ Open to More</Text>
+        </Pressable>
+      </View>
+
+      {/* Filtered list */}
       <FlatList
-        data={meals}
+        data={filteredMeals}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.mealCard}>
@@ -32,6 +82,7 @@ export default function MealListScreen() {
         )}
       />
 
+      {/* Add meal event */}
       <Pressable
         style={styles.button}
         onPress={() => {
@@ -59,6 +110,21 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 16,
+    gap: 10,
+  },
+  toggleButton: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+  },
+  activeToggle: {
+    backgroundColor: "#e0e0e0",
   },
   mealCard: {
     backgroundColor: "#f0f0f0",

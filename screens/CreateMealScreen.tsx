@@ -5,10 +5,14 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 type Meal = {
   id: string;
   title: string;
+  mealType: "Meal Buddy" | "Open to More";
 };
 
 export default function CreateMealScreen() {
   const [title, setTitle] = useState("");
+  const [mealType, setMealType] = useState<"Meal Buddy" | "Open to More">(
+    "Meal Buddy"
+  );
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -22,6 +26,7 @@ export default function CreateMealScreen() {
     const newMeal = {
       id: Date.now().toString(),
       title,
+      mealType,
     };
 
     addMeal(newMeal);
@@ -37,6 +42,28 @@ export default function CreateMealScreen() {
         onChangeText={setTitle}
         style={styles.input}
       />
+
+      {/* Meal Type Toggle */}
+      <View style={styles.toggleContainer}>
+        <Pressable
+          style={[
+            styles.toggleButton,
+            mealType === "Meal Buddy" && styles.activeToggle,
+          ]}
+          onPress={() => setMealType("Meal Buddy")}
+        >
+          <Text>🍜 Meal Buddy</Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.toggleButton,
+            mealType === "Open to More" && styles.activeToggle,
+          ]}
+          onPress={() => setMealType("Open to More")}
+        >
+          <Text>❤️ Open to More</Text>
+        </Pressable>
+      </View>
       <Pressable style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit</Text>
       </Pressable>
@@ -53,6 +80,21 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginBottom: 20,
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  toggleButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginHorizontal: 6,
+    borderRadius: 20,
+    backgroundColor: "#eee",
+  },
+  activeToggle: {
+    backgroundColor: "#007aff",
   },
   button: {
     backgroundColor: "#007aff",
