@@ -1,0 +1,30 @@
+{
+    "sourceFile": "firebase.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1748640671323,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748640701730,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,18 +1,19 @@\n-// Import the functions you need from the SDKs you need\n+// firebase.ts\n import { initializeApp } from \"firebase/app\";\n-// TODO: Add SDKs for Firebase products that you want to use\n-// https://firebase.google.com/docs/web/setup#available-libraries\n+import { getDatabase } from \"firebase/database\";\n \n-// Your web app's Firebase configuration\n const firebaseConfig = {\n   apiKey: \"AIzaSyC6jKMnlwW8Iqucf5RlTXkSjCTOfDn_fhY\",\n   authDomain: \"chopmeet-dda66.firebaseapp.com\",\n   databaseURL: \"https://chopmeet-dda66-default-rtdb.firebaseio.com\",\n   projectId: \"chopmeet-dda66\",\n   storageBucket: \"chopmeet-dda66.firebasestorage.app\",\n   messagingSenderId: \"114256882016\",\n-  appId: \"1:114256882016:web:36db75c94b0f741021d605\"\n+  appId: \"1:114256882016:web:36db75c94b0f741021d605\",\n };\n\\ No newline at end of file\n \n-// Initialize Firebase\n-const app = initializeApp(firebaseConfig);\n+const app = initializeApp(firebaseConfig);\n+\n+const db = getDatabase(app);\n+\n+export { db };\n"
+                },
+                {
+                    "date": 1748650304827,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,19 +1,22 @@\n // firebase.ts\n import { initializeApp } from \"firebase/app\";\n import { getDatabase } from \"firebase/database\";\n+import { getAuth } from \"firebase/auth\";\n+import { getStorage } from \"firebase/storage\";\n \n const firebaseConfig = {\n   apiKey: \"AIzaSyC6jKMnlwW8Iqucf5RlTXkSjCTOfDn_fhY\",\n   authDomain: \"chopmeet-dda66.firebaseapp.com\",\n   databaseURL: \"https://chopmeet-dda66-default-rtdb.firebaseio.com\",\n   projectId: \"chopmeet-dda66\",\n-  storageBucket: \"chopmeet-dda66.firebasestorage.app\",\n+  storageBucket: \"chopmeet-dda66.appspot.com\",\n   messagingSenderId: \"114256882016\",\n   appId: \"1:114256882016:web:36db75c94b0f741021d605\",\n };\n \n const app = initializeApp(firebaseConfig);\n-\n\\ No newline at end of file\n const db = getDatabase(app);\n+const auth = getAuth(app);\n+const storage = getStorage(app);\n \n-export { db };\n+export { db, auth, storage };\n"
+                },
+                {
+                    "date": 1748652850066,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,8 @@\n-// firebase.ts\n-import { initializeApp } from \"firebase/app\";\n-import { getDatabase } from \"firebase/database\";\n-import { getAuth } from \"firebase/auth\";\n-import { getStorage } from \"firebase/storage\";\n+import { initializeApp } from 'firebase/app';\n+import { getAuth } from 'firebase/auth';\n+import { getDatabase } from 'firebase/database';\n+import { getStorage } from 'firebase/storage';\n \n const firebaseConfig = {\n   apiKey: \"AIzaSyC6jKMnlwW8Iqucf5RlTXkSjCTOfDn_fhY\",\n   authDomain: \"chopmeet-dda66.firebaseapp.com\",\n@@ -14,9 +13,9 @@\n   appId: \"1:114256882016:web:36db75c94b0f741021d605\",\n };\n \n const app = initializeApp(firebaseConfig);\n+const auth = getAuth(app);\n const db = getDatabase(app);\n-const auth = getAuth(app);\n const storage = getStorage(app);\n \n-export { db, auth, storage };\n+export { auth, db, storage };\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1748640671323,
+            "name": "Commit-0",
+            "content": "// Import the functions you need from the SDKs you need\nimport { initializeApp } from \"firebase/app\";\n// TODO: Add SDKs for Firebase products that you want to use\n// https://firebase.google.com/docs/web/setup#available-libraries\n\n// Your web app's Firebase configuration\nconst firebaseConfig = {\n  apiKey: \"AIzaSyC6jKMnlwW8Iqucf5RlTXkSjCTOfDn_fhY\",\n  authDomain: \"chopmeet-dda66.firebaseapp.com\",\n  databaseURL: \"https://chopmeet-dda66-default-rtdb.firebaseio.com\",\n  projectId: \"chopmeet-dda66\",\n  storageBucket: \"chopmeet-dda66.firebasestorage.app\",\n  messagingSenderId: \"114256882016\",\n  appId: \"1:114256882016:web:36db75c94b0f741021d605\"\n};\n\n// Initialize Firebase\nconst app = initializeApp(firebaseConfig);"
+        }
+    ]
+}
