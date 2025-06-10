@@ -1,0 +1,18 @@
+{
+    "sourceFile": "package.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1748635331381,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1748635331381,
+            "name": "Commit-0",
+            "content": "{\n  \"name\": \"chop-meet\",\n  \"version\": \"1.0.0\",\n  \"type\": \"module\",\n  \"main\": \"index.ts\",\n  \"scripts\": {\n    \"start\": \"expo start\",\n    \"android\": \"expo start --android\",\n    \"ios\": \"expo start --ios\",\n    \"web\": \"expo start --web\"\n  },\n  \"dependencies\": {\n    \"@react-navigation/native\": \"^7.1.9\",\n    \"@react-navigation/native-stack\": \"^7.3.13\",\n    \"expo\": \"~53.0.9\",\n    \"expo-status-bar\": \"~2.2.3\",\n    \"react\": \"19.0.0\",\n    \"react-native\": \"0.79.2\",\n    \"react-native-gesture-handler\": \"~2.24.0\",\n    \"react-native-reanimated\": \"^3.18.0\",\n    \"react-native-safe-area-context\": \"^5.4.0\",\n    \"react-native-screens\": \"~4.10.0\"\n  },\n  \"devDependencies\": {\n    \"@babel/core\": \"^7.25.2\",\n    \"@types/react\": \"~19.0.10\",\n    \"typescript\": \"~5.8.3\"\n  },\n  \"private\": true\n}\n"
+        }
+    ]
+}

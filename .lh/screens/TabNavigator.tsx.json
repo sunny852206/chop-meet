@@ -1,0 +1,18 @@
+{
+    "sourceFile": "screens/TabNavigator.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1748641695813,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1748641695813,
+            "name": "Commit-0",
+            "content": "import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';\nimport MealListScreen from './MealListScreen';\nimport CreateMealScreen from './CreateMealScreen';\nimport ChatHistoryScreen from './ChatHistoryScreen';\nimport { Ionicons } from '@expo/vector-icons';\n\nconst Tab = createBottomTabNavigator();\n\nexport default function TabNavigator() {\n  return (\n    <Tab.Navigator>\n      <Tab.Screen\n        name=\"Meals\"\n        component={MealListScreen}\n        options={{\n          tabBarIcon: ({ color, size }) => (\n            <Ionicons name=\"restaurant\" color={color} size={size} />\n          ),\n        }}\n      />\n      <Tab.Screen\n        name=\"Create\"\n        component={CreateMealScreen}\n        options={{\n          tabBarIcon: ({ color, size }) => (\n            <Ionicons name=\"add-circle\" color={color} size={size} />\n          ),\n        }}\n      />\n      <Tab.Screen\n        name=\"Chats\"\n        component={ChatHistoryScreen}\n        options={{\n          tabBarIcon: ({ color, size }) => (\n            <Ionicons name=\"chatbubbles\" color={color} size={size} />\n          ),\n        }}\n      />\n    </Tab.Navigator>\n  );\n}\n"
+        }
+    ]
+}

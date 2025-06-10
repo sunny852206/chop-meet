@@ -1,0 +1,192 @@
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  Platform,
+  Alert,
+} from 'react-native';
+import { useState } from 'react';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ref, push, set } from 'firebase/database';
+import { db } from '../firebase';
+import type { RootStackParamList, Meal } from '../types';
+
+export default function CreateMealScreen() {
+  const [title, setTitle] = useState('');
+  const [mealType, setMealType] = useState<'Meal Buddy' | 'Open to More'>('Meal Buddy');
+  const [location, setLocation] = useState('');
+  const [time, setTime] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [budget, setBudget] = useState('');
+  const [cuisine, setCuisine] = useState('');
+  const [people, setPeople] = useState('');
+  const [max, setMax] = useState('');
+
+  const route = useRoute<RouteProp<RootStackParamList, 'CreateMeal'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    if (!route.params) {
+    console.warn('⚠️ Missing params on CreateMealScreen');
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>⚠️ Cannot create meal — missing parameters.</Text>
+        <Pressable onPress={() => navigation.goBack()} style={{ marginTop: 12 }}>
+          <Text style={{ color: 'blue' }}>Go Back</Text>
+        </Pressable>
+      </View>
+    );
+  }
+  const { addMeal, userId } = route.params;
+
+  const handleCreate = async () => {
+    if (!title || !location || !time || !budget || !cuisine || !userId) {
+      Alert.alert('Missing fields', 'Please fill in all fields.');
+      return;
+    }
+
+    try {
+      const newMealRef = push(ref(db, 'meals'));
+      const newMeal: Meal = {
+        id: newMealRef.key ?? '',
+        mealType,
+        title,
+        location,
+        time,
+        date: date.toISOString().split('T')[0],
+        budget,
+        cuisine,
+        creatorId: userId,
+        joinedIds: [userId],
+        people: Number(people),
+        max: Number(max),
+      };
+
+      await set(ref(db, `meals/${newMealRef.key}`), newMeal);
+      addMeal(newMeal);
+      navigation.goBack();
+    } catch (err) {
+      console.error('❌ Failed to create meal:', err);
+      Alert.alert('Error', 'Failed to create meal.');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>🍱 Title</Text>
+      <TextInput style={styles.input} value={title} onChangeText={setTitle} />
+
+      <Text style={styles.label}>🍴 Meal Type</Text>
+      <View style={styles.toggleContainer}>
+        <Pressable
+          style={[
+            styles.toggleButton,
+            mealType === 'Meal Buddy' && styles.toggleSelected,
+          ]}
+          onPress={() => setMealType('Meal Buddy')}
+        >
+          <Text style={mealType === 'Meal Buddy' ? styles.toggleTextSelected : styles.toggleText}>
+            Meal Buddy
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.toggleButton,
+            mealType === 'Open to More' && styles.toggleSelected,
+          ]}
+          onPress={() => setMealType('Open to More')}
+        >
+          <Text style={mealType === 'Open to More' ? styles.toggleTextSelected : styles.toggleText}>
+            Open to More
+          </Text>
+        </Pressable>
+      </View>
+
+      <Text style={styles.label}>📍 Location</Text>
+      <TextInput style={styles.input} value={location} onChangeText={setLocation} />
+
+      <Text style={styles.label}>🕰 Time</Text>
+      <TextInput style={styles.input} value={time} onChangeText={setTime} />
+
+      <Text style={styles.label}>📅 Date</Text>
+      <Pressable onPress={() => setShowDatePicker(true)} style={styles.input}>
+        <Text>{date.toDateString()}</Text>
+      </Pressable>
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(_, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) setDate(selectedDate);
+          }}
+        />
+      )}
+
+      <Text style={styles.label}>💰 Budget</Text>
+      <TextInput style={styles.input} value={budget} onChangeText={setBudget} />
+
+      <Text style={styles.label}>🍜 Cuisine</Text>
+      <TextInput style={styles.input} value={cuisine} onChangeText={setCuisine} />
+
+      <Text style={styles.label}>👥 People</Text>
+      <TextInput style={styles.input} value={people} onChangeText={setPeople} keyboardType="number-pad" />
+
+      <Text style={styles.label}>🔢 Max</Text>
+      <TextInput style={styles.input} value={max} onChangeText={setMax} keyboardType="number-pad" />
+
+      <Pressable onPress={handleCreate} style={styles.button}>
+        <Text style={styles.buttonText}>Create Meal</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  label: { fontWeight: 'bold', marginTop: 12, marginBottom: 4 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  button: {
+    marginTop: 20,
+    backgroundColor: '#007aff',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: { color: '#fff', fontWeight: 'bold' },
+  toggleContainer: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    gap: 8,
+  },
+  toggleButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#aaa',
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'center',
+  },
+  toggleSelected: {
+    backgroundColor: '#007aff',
+    borderColor: '#007aff',
+  },
+  toggleText: {
+    color: '#333',
+  },
+  toggleTextSelected: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});

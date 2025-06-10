@@ -1,0 +1,74 @@
+{
+    "sourceFile": "tsconfig.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 14,
+            "patches": [
+                {
+                    "date": 1748561154024,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748561180551,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,6 +2,8 @@\n   \"extends\": \"expo/tsconfig.base\",\n   \"compilerOptions\": {\n     \"strict\": true,\n     \"jsx\": \"react-native\",\n+    \"target\": \"esnext\",\n+    \"module\": \"esnext\",\n   }\n }\n"
+                },
+                {
+                    "date": 1748561242175,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,17 @@\n {\n   \"extends\": \"expo/tsconfig.base\",\n   \"compilerOptions\": {\n     \"strict\": true,\n-    \"jsx\": \"react-native\",\n     \"target\": \"esnext\",\n     \"module\": \"esnext\",\n+    \"lib\": [\"dom\", \"esnext\"],\n+    \"jsx\": \"react-native\",\n+    \"allowJs\": true,\n+    \"skipLibCheck\": true,\n+    \"noEmit\": true,\n+    \"isolatedModules\": true,\n+    \"moduleResolution\": \"node\",\n+    \"resolveJsonModule\": true,\n+    \"esModuleInterop\": true\n   }\n }\n"
+                },
+                {
+                    "date": 1748635004945,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n     \"noEmit\": true,\n     \"isolatedModules\": true,\n-    \"moduleResolution\": \"node\",\n+    \"moduleResolution\": \"node16\",\n     \"resolveJsonModule\": true,\n     \"esModuleInterop\": true\n   }\n }\n"
+                },
+                {
+                    "date": 1748635037405,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n     \"noEmit\": true,\n     \"isolatedModules\": true,\n-    \"moduleResolution\": \"node16\",\n+    \"moduleResolution\": \"node\",\n     \"resolveJsonModule\": true,\n     \"esModuleInterop\": true\n   }\n }\n"
+                },
+                {
+                    "date": 1748635187627,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n     \"noEmit\": true,\n     \"isolatedModules\": true,\n-    \"moduleResolution\": \"node\",\n+    \"moduleResolution\": \"node16\",\n     \"resolveJsonModule\": true,\n     \"esModuleInterop\": true\n   }\n }\n"
+                },
+                {
+                    "date": 1748635214084,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n   \"extends\": \"expo/tsconfig.base\",\n   \"compilerOptions\": {\n     \"strict\": true,\n     \"target\": \"esnext\",\n-    \"module\": \"esnext\",\n+    \"module\": \"node16\",\n     \"lib\": [\"dom\", \"esnext\"],\n     \"jsx\": \"react-native\",\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n"
+                },
+                {
+                    "date": 1748635266095,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,17 +1,16 @@\n {\n-  \"extends\": \"expo/tsconfig.base\",\n   \"compilerOptions\": {\n     \"strict\": true,\n     \"target\": \"esnext\",\n-    \"module\": \"node16\",\n+    \"module\": \"esnext\",\n     \"lib\": [\"dom\", \"esnext\"],\n     \"jsx\": \"react-native\",\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n     \"noEmit\": true,\n     \"isolatedModules\": true,\n-    \"moduleResolution\": \"node16\",\n+    \"moduleResolution\": \"node16\",    \n     \"resolveJsonModule\": true,\n     \"esModuleInterop\": true\n   }\n }\n"
+                },
+                {
+                    "date": 1748635276373,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,16 +1,17 @@\n {\n+  \"extends\": \"expo/tsconfig.base\",\n   \"compilerOptions\": {\n     \"strict\": true,\n-    \"target\": \"esnext\",\n-    \"module\": \"esnext\",\n+    \"target\": \"node16\",\n+    \"module\": \"node16\",\n     \"lib\": [\"dom\", \"esnext\"],\n     \"jsx\": \"react-native\",\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n     \"noEmit\": true,\n     \"isolatedModules\": true,\n-    \"moduleResolution\": \"node16\",    \n+    \"moduleResolution\": \"node16\",\n     \"resolveJsonModule\": true,\n     \"esModuleInterop\": true\n   }\n }\n"
+                },
+                {
+                    "date": 1748635285941,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n {\n   \"extends\": \"expo/tsconfig.base\",\n   \"compilerOptions\": {\n     \"strict\": true,\n-    \"target\": \"node16\",\n+    \"target\": \"esnext\",\n     \"module\": \"node16\",\n     \"lib\": [\"dom\", \"esnext\"],\n     \"jsx\": \"react-native\",\n     \"allowJs\": true,\n"
+                },
+                {
+                    "date": 1748635351391,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,17 +1,16 @@\n {\n-  \"extends\": \"expo/tsconfig.base\",\n   \"compilerOptions\": {\n     \"strict\": true,\n     \"target\": \"esnext\",\n-    \"module\": \"node16\",\n+    \"module\": \"esnext\",\n     \"lib\": [\"dom\", \"esnext\"],\n     \"jsx\": \"react-native\",\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n     \"noEmit\": true,\n     \"isolatedModules\": true,\n-    \"moduleResolution\": \"node16\",\n+    \"moduleResolution\": \"node\",           // 保守設定\n     \"resolveJsonModule\": true,\n     \"esModuleInterop\": true\n   }\n }\n"
+                },
+                {
+                    "date": 1748635473020,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,9 +8,9 @@\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n     \"noEmit\": true,\n     \"isolatedModules\": true,\n-    \"moduleResolution\": \"node\",           // 保守設定\n+    \"moduleResolution\": \"node\",  \n     \"resolveJsonModule\": true,\n     \"esModuleInterop\": true\n   }\n }\n"
+                },
+                {
+                    "date": 1748637387891,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,15 +2,19 @@\n   \"compilerOptions\": {\n     \"strict\": true,\n     \"target\": \"esnext\",\n     \"module\": \"esnext\",\n-    \"lib\": [\"dom\", \"esnext\"],\n+    \"lib\": [\n+      \"dom\",\n+      \"esnext\"\n+    ],\n     \"jsx\": \"react-native\",\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n     \"noEmit\": true,\n     \"isolatedModules\": true,\n-    \"moduleResolution\": \"node\",  \n+    \"moduleResolution\": \"node\",\n     \"resolveJsonModule\": true,\n     \"esModuleInterop\": true\n-  }\n+  },\n+  \"extends\": \"expo/tsconfig.base\"\n }\n"
+                },
+                {
+                    "date": 1748648268929,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,20 @@\n+{\n+  \"compilerOptions\": {\n+    \"strict\": true,\n+    \"target\": \"esnext\",\n+    \"module\": \"esnext\",\n+    \"lib\": [\n+      \"dom\",\n+      \"esnext\"\n+    ],\n+    \"jsx\": \"react-native\",\n+    \"allowJs\": true,\n+    \"skipLibCheck\": true,\n+    \"noEmit\": true,\n+    \"isolatedModules\": true,\n+    \"moduleResolution\": \"node\",\n+    \"resolveJsonModule\": true,\n+    \"esModuleInterop\": true\n+  },\n+  \"extends\": \"expo/tsconfig.base\"\n+}\n"
+                },
+                {
+                    "date": 1748648306366,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,30 +11,10 @@\n     \"allowJs\": true,\n     \"skipLibCheck\": true,\n     \"noEmit\": true,\n     \"isolatedModules\": true,\n-    \"moduleResolution\": \"node\",\n+    \"moduleResolution\": \"bundler\",\n     \"resolveJsonModule\": true,\n     \"esModuleInterop\": true\n   },\n   \"extends\": \"expo/tsconfig.base\"\n }\n-{\n-  \"compilerOptions\": {\n-    \"strict\": true,\n-    \"target\": \"esnext\",\n-    \"module\": \"esnext\",\n-    \"lib\": [\n-      \"dom\",\n-      \"esnext\"\n-    ],\n-    \"jsx\": \"react-native\",\n-    \"allowJs\": true,\n-    \"skipLibCheck\": true,\n-    \"noEmit\": true,\n-    \"isolatedModules\": true,\n-    \"moduleResolution\": \"node\",\n-    \"resolveJsonModule\": true,\n-    \"esModuleInterop\": true\n-  },\n-  \"extends\": \"expo/tsconfig.base\"\n-}\n"
+                }
+            ],
+            "date": 1748561154024,
+            "name": "Commit-0",
+            "content": "{\n  \"extends\": \"expo/tsconfig.base\",\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"jsx\": \"react-native\",\n  }\n}\n"
+        }
+    ]
+}

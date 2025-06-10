@@ -1,0 +1,22 @@
+{
+    "sourceFile": "types/Meal.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1748638566567,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748641207272,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,13 +1,14 @@\n export type Meal = {\n   id: string;\n   title: string;\n   mealType: \"Meal Buddy\" | \"Open to More\";\n-  location?: string;\n-  date?: string;\n-  time?: string;\n-  budget?: string;\n-  cuisine?: string;\n-  people?: number;\n-  max?: number;\n-  createdBy?: string;\n+  location: string;\n+  time: string;\n+  date: string;\n+  budget: string;\n+  cuisine: string;\n+  people: number;\n+  max: number;\n+  creatorId: string;\n+  joinedIds: string[];\n };\n"
+                }
+            ],
+            "date": 1748638566567,
+            "name": "Commit-0",
+            "content": "export type Meal = {\n  id: string;\n  title: string;\n  mealType: \"Meal Buddy\" | \"Open to More\";\n  location?: string;\n  date?: string;\n  time?: string;\n  budget?: string;\n  cuisine?: string;\n  people?: number;\n  max?: number;\n  createdBy?: string;\n};\n"
+        }
+    ]
+}

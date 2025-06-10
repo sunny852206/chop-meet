@@ -1,0 +1,58 @@
+{
+    "sourceFile": "types/types.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 10,
+            "patches": [
+                {
+                    "date": 1748563404379,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748641242981,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,11 +4,10 @@\n   Landing: undefined;\n   Login: undefined;\n   Register: undefined;\n   MealList: undefined;\n-  CreateMeal: {\n-    addMeal: (meal: Meal) => void;\n-  };\n+  CreateMeal: { \n+    addMeal: (meal: Meal) => void; userId: string };\n   MealDetail: {\n     meal: Meal;\n   };\n   ChatRoom: {\n"
+                },
+                {
+                    "date": 1748641353811,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,4 +13,10 @@\n   ChatRoom: {\n     mealId: string;\n   };\n };\n+\n+export type ChatMessage = {\n+  sender: string;\n+  message: string;\n+  timestamp: string;\n+};\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1748644680101,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,29 @@\n+import type { Meal } from \"./Meal\";\n+\n+export type RootStackParamList = {\n+  Landing: undefined;\n+  Login: undefined;\n+  Register: undefined;\n+  MealList: undefined;\n+  CreateMeal: { \n+    addMeal: (meal: Meal) => void; userId: string };\n+  MealDetail: {\n+    meal: Meal;\n+  };\n+  ChatRoom: {\n+    mealId: string;\n+  };\n+};\n+\n+export type ChatMessage = {\n+  sender: string;\n+  message: string;\n+  timestamp: string;\n+};\n+\n+export interface Meal {\n+  title: string;\n+  location: string;\n+  time: string;\n+  joinedIds?: string[];\n+}\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1748644688888,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,27 +25,5 @@\n   title: string;\n   location: string;\n   time: string;\n   joinedIds?: string[];\n-}\n-import type { Meal } from \"./Meal\";\n-\n-export type RootStackParamList = {\n-  Landing: undefined;\n-  Login: undefined;\n-  Register: undefined;\n-  MealList: undefined;\n-  CreateMeal: { \n-    addMeal: (meal: Meal) => void; userId: string };\n-  MealDetail: {\n-    meal: Meal;\n-  };\n-  ChatRoom: {\n-    mealId: string;\n-  };\n-};\n-\n-export type ChatMessage = {\n-  sender: string;\n-  message: string;\n-  timestamp: string;\n };\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1748644794299,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,10 +20,15 @@\n   message: string;\n   timestamp: string;\n };\n \n-export interface Meal {\n+export type Meal = {\n+  id: string;\n   title: string;\n+  mealType: 'Meal Buddy' | 'Open to More';\n   location: string;\n\\ No newline at end of file\n   time: string;\n+  budget: string;\n+  cuisine: string;\n   joinedIds?: string[];\n-};\n+};\n+\n"
+                },
+                {
+                    "date": 1748647403441,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,29 +5,24 @@\n   Login: undefined;\n   Register: undefined;\n   MealList: undefined;\n   CreateMeal: { \n-    addMeal: (meal: Meal) => void; userId: string };\n+    addMeal: (meal: Meal) => void; \n+    userId: string };\n   MealDetail: {\n     meal: Meal;\n   };\n   ChatRoom: {\n     mealId: string;\n   };\n+  MyMeals: undefined;\n };\n \n export type ChatMessage = {\n-  sender: string;\n+  senderId: string;\n+  senderName: string;\n   message: string;\n-  timestamp: string;\n+  text: string;\n+  timestamp: number;\n+  readBy?: string[];\n };\n \n-export type Meal = {\n-  id: string;\n-  title: string;\n-  mealType: 'Meal Buddy' | 'Open to More';\n-  location: string;\n-  time: string;\n-  budget: string;\n-  cuisine: string;\n-  joinedIds?: string[];\n-};\n"
+                },
+                {
+                    "date": 1748648117996,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,8 +13,9 @@\n   };\n   ChatRoom: {\n     mealId: string;\n   };\n+  EditMeal: { meal: Meal };\n   MyMeals: undefined;\n };\n \n export type ChatMessage = {\n"
+                },
+                {
+                    "date": 1748648724978,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -26,4 +26,5 @@\n   timestamp: number;\n   readBy?: string[];\n };\n \n+\n"
+                },
+                {
+                    "date": 1748651807325,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,8 +15,9 @@\n     mealId: string;\n   };\n   EditMeal: { meal: Meal };\n   MyMeals: undefined;\n+  MainTabs: undefined; \n };\n \n export type ChatMessage = {\n   senderId: string;\n"
+                },
+                {
+                    "date": 1749533936742,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,9 +11,9 @@\n   MealDetail: {\n     meal: Meal;\n   };\n   ChatRoom: {\n-    mealId: string;\n+    mealId: string; mealTitle: string\n   };\n   EditMeal: { meal: Meal };\n   MyMeals: undefined;\n   MainTabs: undefined; \n"
+                }
+            ],
+            "date": 1748563404379,
+            "name": "Commit-0",
+            "content": "import type { Meal } from \"./Meal\";\n\nexport type RootStackParamList = {\n  Landing: undefined;\n  Login: undefined;\n  Register: undefined;\n  MealList: undefined;\n  CreateMeal: {\n    addMeal: (meal: Meal) => void;\n  };\n  MealDetail: {\n    meal: Meal;\n  };\n  ChatRoom: {\n    mealId: string;\n  };\n};\n"
+        }
+    ]
+}

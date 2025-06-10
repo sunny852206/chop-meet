@@ -1,0 +1,46 @@
+{
+    "sourceFile": "navigation/types.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 7,
+            "patches": [
+                {
+                    "date": 1748561566770,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1748561650584,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,9 @@\n+export type Meal = {\n+  id: string;\n+  title: string;\n+  mealType: \"Meal Buddy\" | \"Open to More\";\n+  location?: string;\n+  time?: string;\n+  budget?: string;\n+  cuisine?: string;\n+};\n"
+                },
+                {
+                    "date": 1748562109075,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,13 +1,6 @@\n-export type Meal = {\n-  id: string;\n-  title: string;\n-  mealType: \"Meal Buddy\" | \"Open to More\";\n-  location?: string;\n-  time?: string;\n-  budget?: string;\n-  cuisine?: string;\n-};\n+import type { Meal } from \"../types/Meal\"; // ← 根據你 Meal 型別存放位置調整路徑\n+\n export type RootStackParamList = {\n   Landing: undefined;\n   Login: undefined;\n   Register: undefined;\n@@ -15,9 +8,9 @@\n   CreateMeal: {\n     addMeal: (meal: Meal) => void;\n   };\n   MealDetail: {\n-    mealId: string;\n+    meal: Meal;\n   };\n   ChatRoom: {\n     mealId: string;\n   };\n"
+                },
+                {
+                    "date": 1748562177053,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,17 +1,11 @@\n-import type { Meal } from \"../types/Meal\"; // ← 根據你 Meal 型別存放位置調整路徑\n-\n-export type RootStackParamList = {\n-  Landing: undefined;\n-  Login: undefined;\n-  Register: undefined;\n-  MealList: undefined;\n-  CreateMeal: {\n-    addMeal: (meal: Meal) => void;\n-  };\n-  MealDetail: {\n-    meal: Meal;\n-  };\n-  ChatRoom: {\n-    mealId: string;\n-  };\n+export type Meal = {\n+  id: string;\n+  title: string;\n+  mealType: \"Meal Buddy\" | \"Open to More\";\n+  location?: string;\n+  time?: string;\n+  budget?: string;\n+  cuisine?: string;\n+  people: number;\n+  max: number;\n };\n"
+                },
+                {
+                    "date": 1748562246942,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,17 @@\n-export type Meal = {\n-  id: string;\n-  title: string;\n-  mealType: \"Meal Buddy\" | \"Open to More\";\n-  location?: string;\n-  time?: string;\n-  budget?: string;\n-  cuisine?: string;\n-  people: number;\n-  max: number;\n+import type { Meal } from \"../types/Meal\";\n+\n+export type RootStackParamList = {\n+  Landing: undefined;\n+  Login: undefined;\n+  Register: undefined;\n+  MealList: undefined;\n+  CreateMeal: {\n+    addMeal: (meal: Meal) => void;\n+  };\n+  MealDetail: {\n+    meal: Meal;\n+  };\n+  ChatRoom: {\n+    mealId: string;\n+  };\n };\n"
+                },
+                {
+                    "date": 1748562797004,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import type { Meal } from \"../types/Meal\";\n+import type { Meal } from \"./types/Meal\";\n \n export type RootStackParamList = {\n   Landing: undefined;\n   Login: undefined;\n"
+                },
+                {
+                    "date": 1748562809580,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import type { Meal } from \"./types/Meal\";\n+import type { Meal } from \"./Meal\";\n \n export type RootStackParamList = {\n   Landing: undefined;\n   Login: undefined;\n"
+                },
+                {
+                    "date": 1748562892934,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-import type { Meal } from \"./Meal\";\n+import type { Meal } from \"./Meal\"; \n \n export type RootStackParamList = {\n   Landing: undefined;\n   Login: undefined;\n"
+                }
+            ],
+            "date": 1748561566770,
+            "name": "Commit-0",
+            "content": "export type RootStackParamList = {\n  Landing: undefined;\n  Login: undefined;\n  Register: undefined;\n  MealList: undefined;\n  CreateMeal: {\n    addMeal: (meal: Meal) => void;\n  };\n  MealDetail: {\n    mealId: string;\n  };\n  ChatRoom: {\n    mealId: string;\n  };\n};\n"
+        }
+    ]
+}

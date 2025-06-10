@@ -1,0 +1,18 @@
+{
+    "sourceFile": "screens/LandingScreen.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1748564909361,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1748564909361,
+            "name": "Commit-0",
+            "content": "import { View, Text, StyleSheet, Pressable } from \"react-native\";\nimport { useNavigation } from \"@react-navigation/native\";\nimport type { NativeStackNavigationProp } from \"@react-navigation/native-stack\";\nimport type { RootStackParamList } from \"../types\";\n\n\ntype LandingNav = NativeStackNavigationProp<RootStackParamList, \"Landing\">;\n\nexport default function LandingScreen() {\n  const navigation = useNavigation<LandingNav>();\n\n  return (\n    <View style={styles.container}>\n      <Text style={styles.title}>🍽️ Welcome to Chop Meet</Text>\n      <Text style={styles.subtitle}>\n        Find people. Share a meal. Make connections.\n      </Text>\n\n      <View style={styles.buttonRow}>\n        <Pressable\n          style={[styles.button, styles.registerButton]}\n          onPress={() => navigation.navigate(\"Register\")}\n        >\n          <Text style={styles.buttonText}>Register</Text>\n        </Pressable>\n\n        <Pressable\n          style={[styles.button, styles.loginButton]}\n          onPress={() => navigation.navigate(\"Login\")}\n        >\n          <Text style={styles.buttonText}>Login</Text>\n        </Pressable>\n      </View>\n    </View>\n  );\n}\n\nconst styles = StyleSheet.create({\n  container: {\n    flex: 1,\n    justifyContent: \"center\",\n    alignItems: \"center\",\n    padding: 20,\n    backgroundColor: \"#fdf6f0\",\n  },\n  title: {\n    fontSize: 28,\n    fontWeight: \"bold\",\n    marginBottom: 12,\n  },\n  subtitle: {\n    fontSize: 16,\n    color: \"#666\",\n    marginBottom: 24,\n    textAlign: \"center\",\n  },\n  buttonRow: {\n    flexDirection: \"row\",\n    gap: 12,\n  },\n  button: {\n    paddingVertical: 12,\n    paddingHorizontal: 24,\n    borderRadius: 8,\n  },\n  registerButton: {\n    backgroundColor: \"#007aff\",\n    marginRight: 8,\n  },\n  loginButton: {\n    backgroundColor: \"#28a745\",\n  },\n  buttonText: {\n    color: \"#fff\",\n    fontSize: 16,\n    fontWeight: \"600\",\n  },\n});\n"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "navigation/RootStackParamList.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1748561721096,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1748561721096,
+            "name": "Commit-0",
+            "content": "export type RootStackParamList = {\n  Landing: undefined;\n  Login: undefined;\n  Register: undefined;\n  MealList: undefined;\n  CreateMeal: {\n    addMeal: (meal: any) => void; // 你可以用你的 Meal type\n  };\n  MealDetail: {\n    mealId: string;\n  };\n  ChatRoom: {\n    mealId: string;\n  };\n};\n"
+        }
+    ]
+}
