@@ -19,10 +19,9 @@ export default function CreateMealScreen() {
   const [title, setTitle] = useState('');
   const [mealType, setMealType] = useState<'Meal Buddy' | 'Open to More'>('Meal Buddy');
   const [location, setLocation] = useState('');
-  const [date, setDate] = useState(new Date());
   const [time, setTime] = useState('');
+  const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const [budget, setBudget] = useState('');
   const [cuisine, setCuisine] = useState('');
@@ -33,19 +32,15 @@ export default function CreateMealScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { userId } = route.params;
 
-  const isValidTime = (val: string) => /^([01]?\d|2[0-3]):[0-5]\d$/.test(val);
-
   const handleCreate = async () => {
     if (!title || !location || !time || !budget || !cuisine || !userId) {
       alert('Please fill in all fields.');
       return;
     }
-    if (!isValidTime(time)) {
-      alert('Please enter a valid time in 24hr HH:mm format');
-      return;
-    }
+
     try {
       const newMealRef = push(ref(db, 'meals'));
+
       const newMeal: Meal = {
         id: newMealRef.key ?? '',
         title,
@@ -60,10 +55,11 @@ export default function CreateMealScreen() {
         people: Number(people),
         max: Number(max),
       };
+
       await set(ref(db, `meals/${newMealRef.key}`), newMeal);
       navigation.goBack();
     } catch (err) {
-      console.error('🔥 Failed to create meal:', err);
+      console.error('Failed to create meal:', err);
       alert('Failed to create meal.');
     }
   };
@@ -73,13 +69,19 @@ export default function CreateMealScreen() {
       <Text style={styles.label}>🍴 Meal Type</Text>
       <View style={styles.toggleContainer}>
         <Pressable
-          style={[styles.toggleButton, mealType === 'Meal Buddy' && styles.activeToggle]}
+          style={[
+            styles.toggleButton,
+            mealType === 'Meal Buddy' && styles.activeToggle,
+          ]}
           onPress={() => setMealType('Meal Buddy')}
         >
           <Text>Meal Buddy</Text>
         </Pressable>
         <Pressable
-          style={[styles.toggleButton, mealType === 'Open to More' && styles.activeToggle]}
+          style={[
+            styles.toggleButton,
+            mealType === 'Open to More' && styles.activeToggle,
+          ]}
           onPress={() => setMealType('Open to More')}
         >
           <Text>Open to More</Text>
@@ -92,46 +94,8 @@ export default function CreateMealScreen() {
       <Text style={styles.label}>📍 Location</Text>
       <TextInput style={styles.input} value={location} onChangeText={setLocation} />
 
-      <Text style={styles.label}>🕰 Time (24hr)</Text>
-      {Platform.OS === 'web' ? (
-        <View style={styles.input}>
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (isValidTime(val) || val === '') setTime(val);
-            }}
-            required
-            style={{
-              width: '100%', fontSize: 16, padding: 8,
-              border: 'none', outline: 'none', backgroundColor: 'transparent'
-            }}
-          />
-        </View>
-      ) : (
-        <>
-          <Pressable onPress={() => setShowTimePicker(true)} style={styles.input}>
-            <Text>{time || 'Select time'}</Text>
-          </Pressable>
-          {showTimePicker && (
-            <DateTimePicker
-              value={new Date()}
-              mode="time"
-              is24Hour={true}
-              display="default"
-              onChange={(event, selected) => {
-                setShowTimePicker(false);
-                if (selected) {
-                  const hour = String(selected.getHours()).padStart(2, '0');
-                  const minute = String(selected.getMinutes()).padStart(2, '0');
-                  setTime(`${hour}:${minute}`);
-                }
-              }}
-            />
-          )}
-        </>
-      )}
+      <Text style={styles.label}>🕰 Time</Text>
+      <TextInput style={styles.input} value={time} onChangeText={setTime} />
 
       <Text style={styles.label}>📅 Date</Text>
       {Platform.OS === 'web' ? (
@@ -139,31 +103,33 @@ export default function CreateMealScreen() {
           <input
             type="date"
             value={date.toISOString().split('T')[0]}
-            min={new Date().toISOString().split('T')[0]}
             onChange={(e) => {
               const newDate = new Date(e.target.value);
               if (!isNaN(newDate.getTime())) setDate(newDate);
             }}
-            required
             style={{
-              width: '100%', fontSize: 16, padding: 8,
-              border: 'none', outline: 'none', backgroundColor: 'transparent'
+              width: '100%',
+              fontSize: 16,
+              padding: 8,
+              border: 'none',
+              outline: 'none',
+              backgroundColor: 'transparent',
             }}
           />
         </View>
       ) : (
         <>
-          <Pressable onPress={() => setShowDatePicker(true)} style={styles.input}>
+          <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
             <Text>{date.toDateString()}</Text>
           </Pressable>
+
           {showDatePicker && (
             <DateTimePicker
               value={date}
               mode="date"
-              minimumDate={new Date()}
-              display="default"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
               onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
+                if (Platform.OS !== 'ios') setShowDatePicker(false);
                 if (selectedDate) setDate(selectedDate);
               }}
             />
@@ -178,10 +144,20 @@ export default function CreateMealScreen() {
       <TextInput style={styles.input} value={cuisine} onChangeText={setCuisine} />
 
       <Text style={styles.label}>👥 People</Text>
-      <TextInput style={styles.input} value={people} onChangeText={setPeople} keyboardType="number-pad" />
+      <TextInput
+        style={styles.input}
+        value={people}
+        onChangeText={setPeople}
+        keyboardType="number-pad"
+      />
 
       <Text style={styles.label}>🔢 Max</Text>
-      <TextInput style={styles.input} value={max} onChangeText={setMax} keyboardType="number-pad" />
+      <TextInput
+        style={styles.input}
+        value={max}
+        onChangeText={setMax}
+        keyboardType="number-pad"
+      />
 
       <Pressable onPress={handleCreate} style={styles.button}>
         <Text style={styles.buttonText}>Create Meal</Text>
@@ -201,10 +177,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     paddingHorizontal: 12,
-    paddingVertical: Platform.OS === 'web' ? 0 : 10,
+    paddingVertical: 8,
     borderRadius: 8,
     marginTop: 4,
-    justifyContent: 'center',
   },
   toggleContainer: {
     flexDirection: 'row',

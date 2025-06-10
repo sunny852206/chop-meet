@@ -10,8 +10,7 @@ import {
 } from 'react-native';
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { ref, onValue, get, set } from 'firebase/database'; // ✅ 用 set 替代 update
-import Toast from 'react-native-root-toast';
+import { ref, onValue, update } from 'firebase/database';
 import { db, auth } from '../firebase';
 import type { Meal, RootStackParamList } from '../types';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -59,12 +58,19 @@ export default function MealListScreen() {
     fetchMeals();
   }, []);
 
-  const showToast = (message: string) => {
-    Toast.show(message, {
-      duration: Toast.durations.SHORT,
-      position: Toast.positions.BOTTOM,
-      backgroundColor: 'black',
-      textColor: 'white',
+  const handleAddMeal = (newMeal: Meal) => {
+    setMeals((prev) => [...prev, newMeal]);
+  };
+
+  const handleCreateMeal = () => {
+    if (!userId) {
+      Alert.alert('Login Required', 'You must be logged in to create a meal.');
+      return;
+    }
+
+    navigation.navigate('CreateMeal', {
+      userId,
+      addMeal: handleAddMeal,
     });
   };
 
@@ -74,12 +80,7 @@ export default function MealListScreen() {
       return;
     }
 
-    const joined = Array.isArray(meal.joinedIds)
-      ? meal.joinedIds
-      : typeof meal.joinedIds === 'object' && meal.joinedIds !== null
-        ? Object.values(meal.joinedIds)
-        : [];
-
+    const joined = Array.isArray(meal.joinedIds) ? meal.joinedIds : [];
     const alreadyJoined = joined.includes(userId);
     const maxReached = meal.max && joined.length >= Number(meal.max);
 
@@ -93,19 +94,19 @@ export default function MealListScreen() {
       : [...joined, userId]; // Join
 
     try {
-      // ✅ 使用 set 強制存為純陣列
-      await set(ref(db, `meals/${meal.id}/joinedIds`), updatedJoinedIds);
+      await update(ref(db, `meals/${meal.id}`), {
+        joinedIds: updatedJoinedIds,
+      });
 
-      showToast(alreadyJoined ? '👋 You left the meal.' : '✅ You joined the meal!');
+      Alert.alert(
+        alreadyJoined ? 'Left meal' : 'Joined meal',
+        alreadyJoined ? 'You have left the meal.' : 'You joined the meal!'
+      );
 
-      if (!alreadyJoined) {
-        setTimeout(() => {
-          navigation.navigate('ChatRoom', {
-            mealId: meal.id,
-            mealTitle: meal.title,
-          });
-        }, 300);
-      }
+      navigation.navigate('ChatRoom', {
+        mealId: meal.id,
+        mealTitle: meal.title,
+      });
     } catch (err) {
       console.error('🔥 Failed to join/leave meal:', err);
       Alert.alert('Error', 'Action failed. Please try again.');
@@ -119,47 +120,39 @@ export default function MealListScreen() {
       {loading ? (
         <ActivityIndicator size="large" color="#007aff" style={{ marginTop: 40 }} />
       ) : (
-        <FlatList
-          data={meals}
-          keyExtractor={(item) => item.id}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-          renderItem={({ item }) => {
-            const isCreatedByUser = item.creatorId === userId;
-            const joinedIds = Array.isArray(item.joinedIds)
-              ? item.joinedIds
-              : typeof item.joinedIds === 'object' && item.joinedIds !== null
-                ? Object.values(item.joinedIds)
-                : [];
+      <FlatList
+        data={meals}
+        keyExtractor={(item) => item.id}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        renderItem={({ item }) => {
+          const isCreatedByUser = item.creatorId === userId;
+          const joinedIds = Array.isArray(item.joinedIds) ? item.joinedIds : [];
+          const hasJoined = !!userId && joinedIds.includes(userId);
+          const isFull = item.max && joinedIds.length >= Number(item.max);
+          const isJoinDisabled = !!(isFull && !hasJoined);
 
-            const hasJoined = !!userId && joinedIds.includes(userId);
-            const isFull = item.max && joinedIds.length >= Number(item.max);
-            const isJoinDisabled = !!(isFull && !hasJoined);
+          return (
+            <View style={styles.card}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text>📍 {item.location}</Text>
+              <Text>📅 {item.date || 'N/A'} ⏰ {item.time}</Text>
+              <Text>💰 {item.budget} 🍽️ {item.cuisine}</Text>
+              <Text>👥 {joinedIds.length} / {item.max || 'N/A'} joined</Text>
 
-            return (
-              <View style={styles.card}>
-                <Text style={styles.title}>{item.title}</Text>
-                <Text>📍 {item.location}</Text>
-                <Text>📅 {item.date || 'N/A'} ⏰ {item.time}</Text>
-                <Text>💰 {item.budget} 🍽️ {item.cuisine}</Text>
-                <Text>👥 {joinedIds.length} / {item.max || 'N/A'} joined</Text>
-
-                {isCreatedByUser ? (
-                  <Text style={styles.creatorNote}>You created this meal.</Text>
-                ) : (
-                  <Pressable
-                    style={[
-                      styles.button,
-                      hasJoined ? styles.leaveButton : null,
-                      isJoinDisabled ? { backgroundColor: '#ccc' } : null,
-                    ]}
-                    onPress={() => handleJoinOrLeave(item)}
-                    disabled={isJoinDisabled}
-                  >
-                    <Text style={styles.buttonText}>{hasJoined ? 'Leave' : 'Join'}</Text>
-                  </Pressable>
-                )}
-              </View>
-            );
+              {isCreatedByUser ? (
+                <Text style={styles.creatorNote}>You created this meal.</Text>
+              ) : (
+                <Pressable
+                style={[
+                  styles.button,
+                  hasJoined ? styles.leaveButton : null,
+                  isJoinDisabled ? { backgroundColor: '#ccc' } : null,
+                ]}
+                onPress={() => handleJoinOrLeave(item)}
+                disabled={isJoinDisabled}
+              /> )}
+            </View>
+           );
           }}
           ListEmptyComponent={
             <Text style={{ textAlign: 'center', marginTop: 24 }}>
@@ -168,6 +161,10 @@ export default function MealListScreen() {
           }
         />
       )}
+
+      <Pressable style={styles.createButton} onPress={handleCreateMeal}>
+        <Text style={styles.createButtonText}>＋ Create Meal</Text>
+      </Pressable>
     </View>
   );
 }
@@ -200,4 +197,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff3b30',
   },
   buttonText: { color: '#fff', fontWeight: '600' },
+  createButton: {
+    marginTop: 12,
+    backgroundColor: '#ff7f50',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  createButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

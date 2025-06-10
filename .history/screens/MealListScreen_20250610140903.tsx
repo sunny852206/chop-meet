@@ -10,11 +10,13 @@ import {
 } from 'react-native';
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { ref, onValue, get, set } from 'firebase/database'; // ✅ 用 set 替代 update
+import { ref, onValue, update } from 'firebase/database';
 import Toast from 'react-native-root-toast';
 import { db, auth } from '../firebase';
 import type { Meal, RootStackParamList } from '../types';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'MainTabs'>;
 
@@ -59,6 +61,10 @@ export default function MealListScreen() {
     fetchMeals();
   }, []);
 
+  const handleAddMeal = (newMeal: Meal) => {
+    setMeals((prev) => [...prev, newMeal]);
+  };
+
   const showToast = (message: string) => {
     Toast.show(message, {
       duration: Toast.durations.SHORT,
@@ -68,18 +74,25 @@ export default function MealListScreen() {
     });
   };
 
+  const handleCreateMeal = () => {
+    if (!userId) {
+      Alert.alert('Login Required', 'You must be logged in to create a meal.');
+      return;
+    }
+
+    navigation.navigate('CreateMeal', {
+      userId,
+      addMeal: handleAddMeal,
+    });
+  };
+
   const handleJoinOrLeave = async (meal: Meal) => {
     if (!userId) {
       Alert.alert('Login Required', 'You must be logged in to join or leave.');
       return;
     }
 
-    const joined = Array.isArray(meal.joinedIds)
-      ? meal.joinedIds
-      : typeof meal.joinedIds === 'object' && meal.joinedIds !== null
-        ? Object.values(meal.joinedIds)
-        : [];
-
+    const joined = Array.isArray(meal.joinedIds) ? meal.joinedIds : [];
     const alreadyJoined = joined.includes(userId);
     const maxReached = meal.max && joined.length >= Number(meal.max);
 
@@ -93,8 +106,9 @@ export default function MealListScreen() {
       : [...joined, userId]; // Join
 
     try {
-      // ✅ 使用 set 強制存為純陣列
-      await set(ref(db, `meals/${meal.id}/joinedIds`), updatedJoinedIds);
+      await update(ref(db, `meals/${meal.id}`), {
+        joinedIds: updatedJoinedIds,
+      });
 
       showToast(alreadyJoined ? '👋 You left the meal.' : '✅ You joined the meal!');
 
@@ -125,12 +139,7 @@ export default function MealListScreen() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           renderItem={({ item }) => {
             const isCreatedByUser = item.creatorId === userId;
-            const joinedIds = Array.isArray(item.joinedIds)
-              ? item.joinedIds
-              : typeof item.joinedIds === 'object' && item.joinedIds !== null
-                ? Object.values(item.joinedIds)
-                : [];
-
+            const joinedIds = Array.isArray(item.joinedIds) ? item.joinedIds : [];
             const hasJoined = !!userId && joinedIds.includes(userId);
             const isFull = item.max && joinedIds.length >= Number(item.max);
             const isJoinDisabled = !!(isFull && !hasJoined);
@@ -168,6 +177,10 @@ export default function MealListScreen() {
           }
         />
       )}
+
+      <Pressable style={styles.createButton} onPress={handleCreateMeal}>
+        <Text style={styles.createButtonText}>＋ Create Meal</Text>
+      </Pressable>
     </View>
   );
 }
@@ -200,4 +213,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff3b30',
   },
   buttonText: { color: '#fff', fontWeight: '600' },
+  createButton: {
+    marginTop: 12,
+    backgroundColor: '#ff7f50',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  createButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
