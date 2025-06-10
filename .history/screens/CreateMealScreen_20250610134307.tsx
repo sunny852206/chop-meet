@@ -20,7 +20,7 @@ export default function CreateMealScreen() {
   const [mealType, setMealType] = useState<'Meal Buddy' | 'Open to More'>('Meal Buddy');
   const [location, setLocation] = useState('');
   const [date, setDate] = useState(new Date());
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState(''); // store time as HH:mm string
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -33,19 +33,21 @@ export default function CreateMealScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { userId } = route.params;
 
-  const isValidTime = (val: string) => /^([01]?\d|2[0-3]):[0-5]\d$/.test(val);
-
   const handleCreate = async () => {
     if (!title || !location || !time || !budget || !cuisine || !userId) {
       alert('Please fill in all fields.');
       return;
     }
-    if (!isValidTime(time)) {
+
+    // Optional: validate time format again
+    if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(time)) {
       alert('Please enter a valid time in 24hr HH:mm format');
       return;
     }
+
     try {
       const newMealRef = push(ref(db, 'meals'));
+
       const newMeal: Meal = {
         id: newMealRef.key ?? '',
         title,
@@ -60,6 +62,7 @@ export default function CreateMealScreen() {
         people: Number(people),
         max: Number(max),
       };
+
       await set(ref(db, `meals/${newMealRef.key}`), newMeal);
       navigation.goBack();
     } catch (err) {
@@ -92,20 +95,21 @@ export default function CreateMealScreen() {
       <Text style={styles.label}>📍 Location</Text>
       <TextInput style={styles.input} value={location} onChangeText={setLocation} />
 
+      {/* Time Picker */}
       <Text style={styles.label}>🕰 Time (24hr)</Text>
       {Platform.OS === 'web' ? (
         <View style={styles.input}>
           <input
             type="time"
             value={time}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (isValidTime(val) || val === '') setTime(val);
-            }}
-            required
+            onChange={(e) => setTime(e.target.value)}
             style={{
-              width: '100%', fontSize: 16, padding: 8,
-              border: 'none', outline: 'none', backgroundColor: 'transparent'
+              width: '100%',
+              fontSize: 16,
+              padding: 8,
+              border: 'none',
+              outline: 'none',
+              backgroundColor: 'transparent',
             }}
           />
         </View>
@@ -133,21 +137,25 @@ export default function CreateMealScreen() {
         </>
       )}
 
+      {/* Date Picker */}
       <Text style={styles.label}>📅 Date</Text>
       {Platform.OS === 'web' ? (
         <View style={styles.input}>
           <input
             type="date"
             value={date.toISOString().split('T')[0]}
-            min={new Date().toISOString().split('T')[0]}
+            min={new Date().toISOString().split('T')[0]} // prevent past date
             onChange={(e) => {
               const newDate = new Date(e.target.value);
               if (!isNaN(newDate.getTime())) setDate(newDate);
             }}
-            required
             style={{
-              width: '100%', fontSize: 16, padding: 8,
-              border: 'none', outline: 'none', backgroundColor: 'transparent'
+              width: '100%',
+              fontSize: 16,
+              padding: 8,
+              border: 'none',
+              outline: 'none',
+              backgroundColor: 'transparent',
             }}
           />
         </View>
