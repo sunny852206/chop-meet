@@ -9,23 +9,48 @@ import {
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { dummyUsers } from "../data/dummyUsers";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../lib/firebase";
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
-  const handleRegister = () => {
-    const existingUser = dummyUsers.find((u) => u.email === email);
+  const handleRegister = async () => {
+    if (!email.includes("@") || !email.includes(".")) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      return;
+    }
 
-    if (existingUser) {
-      Alert.alert("Error", "This email is already registered");
-    } else {
-      dummyUsers.push({ email, password });
-      Alert.alert("Success", "Account created (simulated)");
+    if (password.length < 6) {
+      Alert.alert(
+        "Weak Password",
+        "Password must be at least 6 characters long."
+      );
+      return;
+    }
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      Alert.alert("Success", "Account created!");
       navigation.navigate("Login");
+    } catch (error: any) {
+      Alert.alert("Registration Failed", error.message);
     }
   };
+
+  // const handleRegister = () => {
+  //   const existingUser = dummyUsers.find((u) => u.email === email);
+
+  //   if (existingUser) {
+  //     Alert.alert("Error", "This email is already registered");
+  //   } else {
+  //     dummyUsers.push({ email, password });
+  //     Alert.alert("Success", "Account created (simulated)");
+  //     navigation.navigate("Login");
+  //   }
+  // };
 
   return (
     <View style={styles.container}>

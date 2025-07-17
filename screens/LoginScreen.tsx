@@ -9,23 +9,34 @@ import {
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { dummyUsers } from "../data/dummyUsers";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../lib/firebase";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    // Check if user credentials match any dummy account
-    const user = dummyUsers.find(
-      (u) => u.email === email && u.password === password
-    );
+  // const handleLogin = () => {
+  //   // Check if user credentials match any dummy account
+  //   const user = dummyUsers.find(
+  //     (u) => u.email === email && u.password === password
+  //   );
 
-    if (user) {
-      // Navigate to meal list on success
-      navigation.navigate("MealList");
-    } else {
-      Alert.alert("Login Failed", "Invalid email or password");
+  //   if (user) {
+  //     // Navigate to meal list on success
+  //     navigation.navigate("MealList");
+  //   } else {
+  //     Alert.alert("Login Failed", "Invalid email or password");
+  //   }
+  // };
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigation.navigate("MealList"); // 👈 adjust if your route name differs
+    } catch (error: any) {
+      console.error("Login error:", error);
+      Alert.alert("Login Failed", error.message);
     }
   };
 
