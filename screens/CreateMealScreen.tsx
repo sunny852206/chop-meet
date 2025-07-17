@@ -1,6 +1,9 @@
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { db } from "../lib/firebase";
+import { ref, push } from "firebase/database";
+import { auth } from "../lib/firebase";
 
 type Meal = {
   id: string;
@@ -10,27 +13,43 @@ type Meal = {
 
 export default function CreateMealScreen() {
   const [title, setTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [cuisine, setCuisine] = useState("");
+  const [budget, setBudget] = useState("");
+  const [max, setMax] = useState("4");
   const [mealType, setMealType] = useState<"Meal Buddy" | "Open to More">(
     "Meal Buddy"
   );
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Add meal callback from parent screen
-  // @ts-ignore
-  const addMeal = route.params?.addMeal as (meal: Meal) => void;
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim()) return;
 
     const newMeal = {
-      id: Date.now().toString(),
       title,
       mealType,
+      date,
+      time,
+      location,
+      cuisine,
+      budget,
+      max: Number(max),
+      people: 1,
+      creatorId: auth.currentUser?.uid || "unknown",
+      joinedIds: {
+        0: auth.currentUser?.uid || "unknown",
+      },
     };
 
-    addMeal(newMeal);
-    navigation.goBack();
+    try {
+      await push(ref(db, "meals"), newMeal);
+      navigation.goBack();
+    } catch (err) {
+      console.error("🔥 Failed to create meal:", err);
+    }
   };
 
   return (
@@ -42,7 +61,43 @@ export default function CreateMealScreen() {
         onChangeText={setTitle}
         style={styles.input}
       />
-
+      <TextInput
+        placeholder="Date (YYYY-MM-DD)"
+        value={date}
+        onChangeText={setDate}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Time (e.g. 18:30)"
+        value={time}
+        onChangeText={setTime}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Location"
+        value={location}
+        onChangeText={setLocation}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Cuisine"
+        value={cuisine}
+        onChangeText={setCuisine}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Budget ($)"
+        value={budget}
+        onChangeText={setBudget}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Max participants"
+        value={max}
+        onChangeText={setMax}
+        style={styles.input}
+        keyboardType="numeric"
+      />
       {/* Meal Type Toggle */}
       <View style={styles.toggleContainer}>
         <Pressable

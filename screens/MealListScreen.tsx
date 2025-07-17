@@ -1,11 +1,23 @@
 import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect } from "react";
+import { db } from "../lib/firebase"; // adjust path as needed
+import { onValue, ref } from "firebase/database";
 
 type Meal = {
   id: string;
   title: string;
   mealType: "Meal Buddy" | "Open to More";
+  date: string;
+  time: string;
+  location: string;
+  cuisine: string;
+  budget: string;
+  max: number;
+  people: number;
+  creatorId: string;
+  joinedIds?: Record<string, string>;
 };
 
 export default function MealListScreen() {
@@ -13,38 +25,26 @@ export default function MealListScreen() {
     "Meal Buddy"
   );
 
-  const [meals, setMeals] = useState([
-    // Initial dummy meal events
-    {
-      id: "1",
-      title: "🍲 Dollar Shop Hotpot @ Bellevue",
-      mealType: "Meal Buddy",
-    },
-    {
-      id: "2",
-      title: "🍣 Sushi Kashiba Dinner Meetup",
-      mealType: "Open to More",
-    },
-    {
-      id: "3",
-      title: "🍔 Dick’s Drive-In Burger Night",
-      mealType: "Meal Buddy",
-    },
-    {
-      id: "4",
-      title: "🥟 Din Tai Fung Xiao Long Bao Gathering",
-      mealType: "Open to More",
-    },
-    { id: "5", title: "🍜 Ramen Danbo Lunch", mealType: "Meal Buddy" },
-    {
-      id: "6",
-      title: "🌮 Tacos Chukis Capitol Hill",
-      mealType: "Open to More",
-    },
-  ]);
+  const [meals, setMeals] = useState<Meal[]>([]);
   const navigation = useNavigation();
-  const filteredMeals = meals.filter((meal) => meal.mealType === filter);
+  // const filteredMeals = meals.filter((meal) => meal.mealType === filter);
+  useEffect(() => {
+    const mealsRef = ref(db, "meals");
+    const unsubscribe = onValue(mealsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const loadedMeals = Object.entries(data).map(([id, meal]) => ({
+          ...(meal as Meal),
+          id,
+        }));
+        setMeals(loadedMeals);
+      }
+    });
 
+    return () => unsubscribe();
+  }, []);
+
+  const filteredMeals = meals.filter((meal) => meal.mealType === filter);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🍽️ Explore Meal Events</Text>
@@ -74,10 +74,22 @@ export default function MealListScreen() {
       {/* Filtered list */}
       <FlatList
         data={filteredMeals}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) =>
+          item.id ? item.id.toString() : index.toString()
+        }
         renderItem={({ item }) => (
           <View style={styles.mealCard}>
             <Text style={styles.mealTitle}>{item.title}</Text>
+            <Text>📍 {item.location}</Text>
+            <Text>
+              📅 {item.date} ⏰ {item.time}
+            </Text>
+            <Text>
+              💰 {item.budget} 🍽️ {item.cuisine}
+            </Text>
+            <Text>
+              👥 {item.people} / {item.max} joined
+            </Text>
           </View>
         )}
       />
@@ -88,9 +100,7 @@ export default function MealListScreen() {
         onPress={() => {
           // Pass meal-adding function to CreateMeal screen
           // @ts-ignore
-          navigation.navigate("CreateMeal", {
-            addMeal: (newMeal: Meal) => setMeals((prev) => [...prev, newMeal]),
-          });
+          navigation.navigate("CreateMeal");
         }}
       >
         <Text style={styles.buttonText}>＋ Create Meal Event</Text>
@@ -127,14 +137,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#e0e0e0",
   },
   mealCard: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#fff",
     padding: 16,
-    borderRadius: 10,
-    marginBottom: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   mealTitle: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 4,
   },
   button: {
     backgroundColor: "#ff7f50",
