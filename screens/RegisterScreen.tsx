@@ -8,11 +8,11 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { dummyUsers } from "../data/dummyUsers";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../lib/firebase";
 
 export default function RegisterScreen() {
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
@@ -32,29 +32,29 @@ export default function RegisterScreen() {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await updateProfile(userCredential.user, { displayName });
       Alert.alert("Success", "Account created!");
-      navigation.navigate("Login");
+      navigation.navigate("Main");
     } catch (error: any) {
       Alert.alert("Registration Failed", error.message);
     }
   };
 
-  // const handleRegister = () => {
-  //   const existingUser = dummyUsers.find((u) => u.email === email);
-
-  //   if (existingUser) {
-  //     Alert.alert("Error", "This email is already registered");
-  //   } else {
-  //     dummyUsers.push({ email, password });
-  //     Alert.alert("Success", "Account created (simulated)");
-  //     navigation.navigate("Login");
-  //   }
-  // };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
+      <TextInput
+        placeholder="Display Name"
+        style={styles.input}
+        value={displayName}
+        onChangeText={setDisplayName}
+      />
+
       <TextInput
         placeholder="Email"
         style={styles.input}
