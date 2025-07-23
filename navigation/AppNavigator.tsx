@@ -5,6 +5,7 @@ import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import MealListScreen from "../screens/MealListScreen";
 import CreateMealScreen from "../screens/CreateMealScreen";
+import MainTabs from "./MainTabs";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,7 +16,12 @@ export default function AppNavigator() {
         <Stack.Screen name="Landing" component={LandingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="MealList" component={MealListScreen} />
+        <Stack.Screen
+          name="Main"
+          component={MainTabs}
+          options={{ headerShown: false }} // optional: hide the stack header
+        />
+        {/* <Stack.Screen name="MealList" component={MealListScreen} /> */}
         <Stack.Screen name="CreateMeal" component={CreateMealScreen} />
       </Stack.Navigator>
     </NavigationContainer>

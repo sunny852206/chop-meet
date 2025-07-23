@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fdf6f0",
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "bold",
     marginBottom: 12,
   },

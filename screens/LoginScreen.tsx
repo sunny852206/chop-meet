@@ -33,7 +33,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate("MealList"); // 👈 adjust if your route name differs
+      navigation.navigate("Main", { screen: "Home" }); // 👈 adjust if your route name differs
     } catch (error: any) {
       console.error("Login error:", error);
       Alert.alert("Login Failed", error.message);
