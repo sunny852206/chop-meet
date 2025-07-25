@@ -44,6 +44,8 @@ export default function CreateMealScreen() {
       },
     };
 
+    console.log("🍽️ newMeal:", newMeal);
+
     try {
       await push(ref(db, "meals"), newMeal);
       navigation.goBack();
