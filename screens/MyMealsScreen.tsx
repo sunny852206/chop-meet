@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from "react-native";
-import { onValue, ref } from "firebase/database";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  SafeAreaView,
+  Pressable,
+  Alert,
+} from "react-native";
+import { onValue, ref, remove } from "firebase/database";
 import { db, auth } from "../lib/firebase";
 
 export default function MyMealsScreen() {
@@ -31,16 +39,52 @@ export default function MyMealsScreen() {
     });
   }, [userId]);
 
-  const renderCard = (meal) => (
-    <View key={meal.id} style={[styles.card, styles.cardRow]}>
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{meal.title}</Text>
-        <Text>
-          {meal.location} • {meal.time}
-        </Text>
+  const renderCard = (meal) => {
+    // only creator can delete created meals
+    const isCreator = meal.creatorId === auth.currentUser?.uid;
+
+    return (
+      <View key={meal.id} style={[styles.card, styles.cardRow]}>
+        <View style={styles.cardContent}>
+          <Text style={styles.cardTitle}>{meal.title}</Text>
+          <Text>
+            {meal.location} • {meal.time}
+          </Text>
+        </View>
+
+        {isCreator && (
+          <Pressable
+            onPress={() => handleDeleteMeal(meal.id)}
+            style={styles.deleteButton}
+          >
+            <Text style={styles.deleteText}>Delete</Text>
+          </Pressable>
+        )}
       </View>
-    </View>
-  );
+    );
+  };
+
+  const handleDeleteMeal = (mealId) => {
+    Alert.alert("Delete Meal", "Are you sure you want to delete this meal?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await remove(ref(db, `meals/${mealId}`));
+            console.log("✅ Meal deleted:", mealId);
+
+            setCreatedMeals((prev) =>
+              prev.filter((meal) => meal.id !== mealId)
+            );
+          } catch (err) {
+            console.error("❌ Failed to delete meal:", err);
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -105,5 +149,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 12,
     color: "#666",
+  },
+  deleteButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: "#ffdddd",
+    borderRadius: 6,
+    marginLeft: 12,
+  },
+
+  deleteText: {
+    color: "red",
+    fontWeight: "600",
   },
 });
