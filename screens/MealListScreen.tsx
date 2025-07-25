@@ -1,10 +1,17 @@
-import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
-import { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Pressable,
+  Alert,
+} from "react-native";
+import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect } from "react";
-import { db } from "../lib/firebase"; // adjust path as needed
-import { onValue, ref } from "firebase/database";
+import { db, auth } from "../lib/firebase";
+import { onValue, ref, set } from "firebase/database";
 
+// Meal type definition
 type Meal = {
   id: string;
   title: string;
@@ -17,17 +24,18 @@ type Meal = {
   max: number;
   people: number;
   creatorId: string;
-  joinedIds?: Record<string, string>;
+  joinedIds?: Record<string, string> | string[];
 };
 
 export default function MealListScreen() {
   const [filter, setFilter] = useState<"Meal Buddy" | "Open to More">(
     "Meal Buddy"
   );
-
   const [meals, setMeals] = useState<Meal[]>([]);
   const navigation = useNavigation();
-  // const filteredMeals = meals.filter((meal) => meal.mealType === filter);
+  const userId = auth.currentUser?.uid;
+
+  // listener for all meals in database
   useEffect(() => {
     const mealsRef = ref(db, "meals");
     const unsubscribe = onValue(mealsRef, (snapshot) => {
@@ -44,12 +52,70 @@ export default function MealListScreen() {
     return () => unsubscribe();
   }, []);
 
+  // Filter meals based on current selected tab
   const filteredMeals = meals.filter((meal) => meal.mealType === filter);
+
+  /**
+   * Handles user joining or leaving a meal.
+   */
+  const handleJoinOrLeave = async (meal: Meal) => {
+    if (!userId) {
+      Alert.alert("Login Required", "You must be logged in to join or leave.");
+      return;
+    }
+
+    const joined = Array.isArray(meal.joinedIds)
+      ? meal.joinedIds
+      : typeof meal.joinedIds === "object" && meal.joinedIds !== null
+      ? Object.values(meal.joinedIds)
+      : [];
+
+    const alreadyJoined = joined.includes(userId);
+    const maxReached = meal.max && joined.length >= Number(meal.max);
+
+    if (!alreadyJoined && maxReached) {
+      Alert.alert(
+        "Full",
+        "This meal has reached the maximum number of participants."
+      );
+      return;
+    }
+
+    const updatedJoinedIds = alreadyJoined
+      ? joined.filter((id) => id !== userId) // leave
+      : [...joined, userId]; // join
+
+    try {
+      await set(ref(db, `meals/${meal.id}/joinedIds`), updatedJoinedIds);
+
+      Alert.alert(
+        alreadyJoined ? "👋 You left the meal." : "✅ You joined the meal!",
+        "",
+        [
+          alreadyJoined
+            ? { text: "OK" }
+            : {
+                text: "Enter Chat",
+                onPress: () =>
+                  // @ts-ignore
+                  navigation.navigate("ChatRoom", {
+                    mealId: meal.id,
+                    mealTitle: meal.title,
+                  }),
+              },
+        ]
+      );
+    } catch (err) {
+      console.error("❌ Failed to join/leave meal:", err);
+      Alert.alert("Error", "Action failed. Please try again.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🍽️ Explore Meal Events</Text>
 
-      {/* Toggle filter */}
+      {/* Toggle filter*/}
       <View style={styles.toggleContainer}>
         <Pressable
           style={[
@@ -74,52 +140,63 @@ export default function MealListScreen() {
       {/* Filtered list */}
       <FlatList
         data={filteredMeals}
-        keyExtractor={(item, index) =>
-          item.id ? item.id.toString() : index.toString()
-        }
-        renderItem={({ item }) => (
-          <View style={styles.mealCard}>
-            <Text style={styles.mealTitle}>{item.title}</Text>
-            <Text>📍 {item.location}</Text>
-            <Text>
-              📅 {item.date} ⏰ {item.time}
-            </Text>
-            <Text>
-              💰 {item.budget} 🍽️ {item.cuisine}
-            </Text>
-            <Text>
-              👥 {item.people} / {item.max} joined
-            </Text>
-          </View>
-        )}
-      />
+        keyExtractor={(item) => item.id}
+        // render each meal with and Join/Leave button
+        renderItem={({ item }) => {
+          const joined = Array.isArray(item.joinedIds)
+            ? item.joinedIds
+            : typeof item.joinedIds === "object"
+            ? Object.values(item.joinedIds)
+            : [];
+          const alreadyJoined = joined.includes(userId ?? "");
+          return (
+            <View style={styles.mealCard}>
+              <Text style={styles.mealTitle}>{item.title}</Text>
+              <Text>📍 {item.location}</Text>
+              <Text>
+                📅 {item.date} ⏰ {item.time}
+              </Text>
+              <Text>
+                💰 {item.budget} 🍽️ {item.cuisine}
+              </Text>
+              <Text>
+                👥 {joined.length} / {item.max} joined
+              </Text>
 
-      {/* Add meal event */}
-      <Pressable
-        style={styles.button}
-        onPress={() => {
-          // Pass meal-adding function to CreateMeal screen
-          // @ts-ignore
-          navigation.navigate("CreateMeal");
+              {/* Add meal event button */}
+              <Pressable
+                style={[
+                  styles.joinButton,
+                  alreadyJoined ? styles.leave : styles.join,
+                ]}
+                onPress={() => handleJoinOrLeave(item)}
+              >
+                <Text style={styles.joinText}>
+                  {alreadyJoined ? "Leave" : "Join"}
+                </Text>
+              </Pressable>
+            </View>
+          );
         }}
+      />
+      {/* Add meal event button */}
+      <Pressable
+        style={styles.fab}
+        onPress={() => navigation.navigate("CreateMeal")}
       >
-        <Text style={styles.buttonText}>＋ Create Meal Event</Text>
+        <Text style={styles.fabText}>＋</Text>
       </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    paddingTop: 40,
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1, padding: 16, paddingTop: 40, backgroundColor: "#fff" },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 16,
+    marginTop: 5,
+    marginBottom: 10,
   },
   toggleContainer: {
     flexDirection: "row",
@@ -154,16 +231,41 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 4,
   },
-  button: {
-    backgroundColor: "#ff7f50",
-    padding: 12,
-    borderRadius: 10,
+  joinButton: {
+    marginTop: 12,
+    padding: 10,
+    borderRadius: 8,
     alignItems: "center",
-    marginTop: 16,
   },
-  buttonText: {
+  join: {
+    backgroundColor: "#4caf50",
+  },
+  leave: {
+    backgroundColor: "#f44336",
+  },
+  joinText: {
     color: "#fff",
-    fontSize: 16,
     fontWeight: "600",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+    backgroundColor: "#ff7f50",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  fabText: {
+    color: "#fff",
+    fontSize: 30,
+    fontWeight: "bold",
   },
 });
