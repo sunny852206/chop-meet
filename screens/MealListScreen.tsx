@@ -6,12 +6,13 @@ import {
   Pressable,
   Alert,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { db, auth } from "../lib/firebase";
 import { onValue, ref, set } from "firebase/database";
 
-// Meal type definition
+// Type Definitions
 type Meal = {
   id: string;
   title: string;
@@ -27,6 +28,16 @@ type Meal = {
   joinedIds?: Record<string, string> | string[];
 };
 
+// Utility Toast Function
+const showToast = (message: string, type: "success" | "error" = "success") => {
+  Toast.show({
+    type,
+    text1: message,
+    position: "top",
+    visibilityTime: 2000,
+  });
+};
+
 export default function MealListScreen() {
   const [filter, setFilter] = useState<"Meal Buddy" | "Open to More">(
     "Meal Buddy"
@@ -35,7 +46,7 @@ export default function MealListScreen() {
   const navigation = useNavigation();
   const userId = auth.currentUser?.uid;
 
-  // listener for all meals in database
+  // listener for all meals
   useEffect(() => {
     const mealsRef = ref(db, "meals");
     const unsubscribe = onValue(mealsRef, (snapshot) => {
@@ -55,9 +66,7 @@ export default function MealListScreen() {
   // Filter meals based on current selected tab
   const filteredMeals = meals.filter((meal) => meal.mealType === filter);
 
-  /**
-   * Handles user joining or leaving a meal.
-   */
+  // Handles user joining or leaving a meal
   const handleJoinOrLeave = async (meal: Meal) => {
     if (!userId) {
       Alert.alert("Login Required", "You must be logged in to join or leave.");
@@ -88,23 +97,27 @@ export default function MealListScreen() {
     try {
       await set(ref(db, `meals/${meal.id}/joinedIds`), updatedJoinedIds);
 
-      Alert.alert(
+      // show toast
+      showToast(
         alreadyJoined ? "👋 You left the meal." : "✅ You joined the meal!",
-        "",
-        [
-          alreadyJoined
-            ? { text: "OK" }
-            : {
-                text: "Enter Chat",
-                onPress: () =>
-                  // @ts-ignore
-                  navigation.navigate("ChatRoom", {
-                    mealId: meal.id,
-                    mealTitle: meal.title,
-                  }),
-              },
-        ]
+        alreadyJoined ? "error" : "success"
       );
+
+      // Prompt chat only when joining
+      if (!alreadyJoined) {
+        Alert.alert("🎉 You're in!", "Want to hop into the group chat now?", [
+          { text: "Not Now" },
+          {
+            text: "Enter Chat",
+            onPress: () =>
+              // @ts-ignore
+              navigation.navigate("ChatRoom", {
+                mealId: meal.id,
+                mealTitle: meal.title,
+              }),
+          },
+        ]);
+      }
     } catch (err) {
       console.error("❌ Failed to join/leave meal:", err);
       Alert.alert("Error", "Action failed. Please try again.");
@@ -113,9 +126,9 @@ export default function MealListScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🍽️ Explore Meal Events</Text>
+      <Text style={styles.title}>🍴 Explore Meal Events</Text>
 
-      {/* Toggle filter*/}
+      {/* Meal Type Tabs*/}
       <View style={styles.toggleContainer}>
         <Pressable
           style={[
@@ -137,11 +150,10 @@ export default function MealListScreen() {
         </Pressable>
       </View>
 
-      {/* Filtered list */}
+      {/* Filtered  Meal List */}
       <FlatList
         data={filteredMeals}
         keyExtractor={(item) => item.id}
-        // render each meal with and Join/Leave button
         renderItem={({ item }) => {
           const joined = Array.isArray(item.joinedIds)
             ? item.joinedIds
@@ -163,7 +175,7 @@ export default function MealListScreen() {
                 👥 {joined.length} / {item.max} joined
               </Text>
 
-              {/* Add meal event button */}
+              {/* Join/Leave Button */}
               <Pressable
                 style={[
                   styles.joinButton,
@@ -179,7 +191,7 @@ export default function MealListScreen() {
           );
         }}
       />
-      {/* Add meal event button */}
+      {/* Create New Meal */}
       <Pressable
         style={styles.fab}
         onPress={() => navigation.navigate("CreateMeal")}
@@ -241,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#4caf50",
   },
   leave: {
-    backgroundColor: "#f44336",
+    backgroundColor: "#dc3545",
   },
   joinText: {
     color: "#fff",
@@ -251,7 +263,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 24,
     right: 24,
-    backgroundColor: "#ff7f50",
+    backgroundColor: "#007bff",
     width: 56,
     height: 56,
     borderRadius: 28,

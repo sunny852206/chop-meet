@@ -135,7 +135,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginTop: 5,
-
     marginBottom: 10,
   },
   tabsContainer: {
