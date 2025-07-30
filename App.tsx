@@ -1,10 +1,15 @@
 import AppNavigator from "./navigation/AppNavigator";
+import Toast from "react-native-toast-message";
 
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function App() {
-  return <AppNavigator />;
+  return (
+    <>
+      <AppNavigator />
+      <Toast />
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
