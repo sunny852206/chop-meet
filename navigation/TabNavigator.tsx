@@ -1,15 +1,15 @@
-// navigation/MainTabs.tsx
+// navigation/TabNavigator.tsx
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MealListScreen from "../screens/MealListScreen";
 import MyMealsScreen from "../screens/MyMealsScreen";
-import ChatScreen from "../screens/ChatScreen";
+import MyChatsScreen from "../screens/MyChatsScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
 
-export default function MainTabs() {
+export default function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -27,7 +27,7 @@ export default function MainTabs() {
     >
       <Tab.Screen name="Home" component={MealListScreen} />
       <Tab.Screen name="MyMeals" component={MyMealsScreen} />
-      <Tab.Screen name="Chats" component={ChatScreen} />
+      <Tab.Screen name="Chats" component={MyChatsScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

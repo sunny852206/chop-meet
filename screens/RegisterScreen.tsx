@@ -10,12 +10,19 @@ import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../lib/firebase";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../types/types";
+
+type RegisterScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Register"
+>;
 
 export default function RegisterScreen() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigation();
+  const navigation = useNavigation<RegisterScreenNavigationProp>();
 
   const handleRegister = async () => {
     if (!email.includes("@") || !email.includes(".")) {
@@ -39,9 +46,13 @@ export default function RegisterScreen() {
       );
       await updateProfile(userCredential.user, { displayName });
       Alert.alert("Success", "Account created!");
-      navigation.navigate("Main");
+      navigation.navigate("MainTabs");
     } catch (error: any) {
-      Alert.alert("Registration Failed", error.message);
+      console.error("Registration error:", error);
+      Alert.alert(
+        "Registration Failed",
+        error.message || "An unknown error occurred."
+      );
     }
   };
 

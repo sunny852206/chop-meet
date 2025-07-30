@@ -8,6 +8,7 @@ import {
   Pressable,
   Alert,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { onValue, ref, remove } from "firebase/database";
 import { db, auth } from "../lib/firebase";
 
@@ -16,6 +17,7 @@ export default function MyMealsScreen() {
   const [joinedMeals, setJoinedMeals] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
   const userId = auth.currentUser?.uid;
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (!userId) return;
@@ -125,6 +127,14 @@ export default function MyMealsScreen() {
           <Text style={styles.emptyText}>No meals to show.</Text>
         )}
       </ScrollView>
+
+      {/* Create New Meal */}
+      <Pressable
+        style={styles.fab}
+        onPress={() => navigation.navigate("CreateMeal")}
+      >
+        <Text style={styles.fabText}>＋</Text>
+      </Pressable>
     </View>
   );
 }
@@ -187,5 +197,26 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 24,
     color: "#666",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+    backgroundColor: "#007bff",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  fabText: {
+    color: "#fff",
+    fontSize: 30,
+    fontWeight: "bold",
   },
 });

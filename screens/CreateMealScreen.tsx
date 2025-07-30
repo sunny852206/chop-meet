@@ -1,62 +1,75 @@
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import { useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { db } from "../lib/firebase";
 import { ref, push } from "firebase/database";
 import { auth } from "../lib/firebase";
 
-type Meal = {
-  id: string;
-  title: string;
-  mealType: "Meal Buddy" | "Open to More";
-};
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { RootStackParamList, Meal } from "../types/types";
 
-export default function CreateMealScreen() {
+type Props = NativeStackScreenProps<RootStackParamList, "CreateMeal">;
+
+export default function CreateMealScreen({ navigation }: Props) {
   const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [location, setLocation] = useState("");
-  const [cuisine, setCuisine] = useState("");
-  const [budget, setBudget] = useState("");
-  const [max, setMax] = useState("4");
   const [mealType, setMealType] = useState<"Meal Buddy" | "Open to More">(
     "Meal Buddy"
   );
-  const navigation = useNavigation();
-  const route = useRoute();
+  const [location, setLocation] = useState("");
+  const [time, setTime] = useState("");
+  const [date, setDate] = useState("");
+  const [budget, setBudget] = useState("");
+  const [cuisine, setCuisine] = useState("");
+  const [people, setPeople] = useState("2");
+  const [max, setMax] = useState("4");
 
-  const handleSubmit = async () => {
-    if (!title.trim()) return;
+  const handleCreate = async () => {
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      Alert.alert("Error", "User not logged in");
+      return;
+    }
 
-    const newMeal = {
+    if (!title || !location || !time || !date) {
+      Alert.alert("Missing Fields", "Please fill in all required fields");
+      return;
+    }
+
+    const newMeal: Omit<Meal, "id"> = {
       title,
       mealType,
-      date,
-      time,
       location,
-      cuisine,
+      time,
+      date,
       budget,
+      cuisine,
+      people: Number(people),
       max: Number(max),
-      people: 1,
-      creatorId: auth.currentUser?.uid || "unknown",
-      joinedIds: {
-        0: auth.currentUser?.uid || "unknown",
-      },
+      creatorId: userId,
+      joinedIds: [userId],
     };
-
-    console.log("🍽️ newMeal:", newMeal);
-
     try {
-      await push(ref(db, "meals"), newMeal);
+      const mealRef = ref(db, "meals");
+      await push(mealRef, newMeal);
+      console.log("New Meal Created:", newMeal);
+      Alert.alert("Success", "Meal created successfully");
       navigation.goBack();
     } catch (err) {
-      console.error("🔥 Failed to create meal:", err);
+      console.error("Failed to create meal:", err);
+      Alert.alert("Error", "Something went wrong.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create Meal Event</Text>
+      <Text style={styles.title}>Required Information</Text>
       <TextInput
         placeholder="Enter event title（Ex: Dollar Shop Hotpot）"
         value={title}
@@ -121,7 +134,7 @@ export default function CreateMealScreen() {
           <Text>❤️ Open to More</Text>
         </Pressable>
       </View>
-      <Pressable style={styles.button} onPress={handleSubmit}>
+      <Pressable style={styles.button} onPress={handleCreate}>
         <Text style={styles.buttonText}>Submit</Text>
       </Pressable>
     </View>
@@ -130,7 +143,7 @@ export default function CreateMealScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: "center" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 16 },
+  title: { fontWeight: "bold", marginBottom: 16 },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",

@@ -11,22 +11,7 @@ import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { db, auth } from "../lib/firebase";
 import { onValue, ref, set } from "firebase/database";
-
-// Type Definitions
-type Meal = {
-  id: string;
-  title: string;
-  mealType: "Meal Buddy" | "Open to More";
-  date: string;
-  time: string;
-  location: string;
-  cuisine: string;
-  budget: string;
-  max: number;
-  people: number;
-  creatorId: string;
-  joinedIds?: Record<string, string> | string[];
-};
+import type { Meal } from "../types/types";
 
 // Utility Toast Function
 const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -51,13 +36,13 @@ export default function MealListScreen() {
     const mealsRef = ref(db, "meals");
     const unsubscribe = onValue(mealsRef, (snapshot) => {
       const data = snapshot.val();
-      if (data) {
-        const loadedMeals = Object.entries(data).map(([id, meal]) => ({
-          ...(meal as Meal),
-          id,
-        }));
-        setMeals(loadedMeals);
-      }
+      if (!data) return;
+
+      const loadedMeals = Object.entries(data).map(([id, meal]) => ({
+        ...(meal as Meal),
+        id,
+      }));
+      setMeals(loadedMeals);
     });
 
     return () => unsubscribe();
@@ -191,13 +176,6 @@ export default function MealListScreen() {
           );
         }}
       />
-      {/* Create New Meal */}
-      <Pressable
-        style={styles.fab}
-        onPress={() => navigation.navigate("CreateMeal")}
-      >
-        <Text style={styles.fabText}>＋</Text>
-      </Pressable>
     </View>
   );
 }
@@ -258,26 +236,5 @@ const styles = StyleSheet.create({
   joinText: {
     color: "#fff",
     fontWeight: "600",
-  },
-  fab: {
-    position: "absolute",
-    bottom: 24,
-    right: 24,
-    backgroundColor: "#007bff",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  fabText: {
-    color: "#fff",
-    fontSize: 30,
-    fontWeight: "bold",
   },
 });
