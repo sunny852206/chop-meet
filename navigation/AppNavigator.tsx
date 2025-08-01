@@ -38,7 +38,7 @@ export default function AppNavigator() {
           name="CreateMeal"
           component={CreateMealScreen}
           options={{
-            title: "Create Meal Event",
+            title: "",
             headerBackVisible: true,
             headerBackTitle: "",
           }}

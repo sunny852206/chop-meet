@@ -4,10 +4,10 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   Pressable,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { onValue, ref, remove } from "firebase/database";
 import { db, auth } from "../lib/firebase";
@@ -95,8 +95,10 @@ export default function MyMealsScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🍽️ My Meal Events</Text>
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>My Meal Events</Text>
+      </View>
 
       {/* Segmented Control Tabs */}
       <View style={styles.tabsContainer}>
@@ -128,24 +130,37 @@ export default function MyMealsScreen() {
         )}
       </ScrollView>
 
-      {/* Create New Meal */}
+      {/* Create New Meal Event*/}
       <Pressable
         style={styles.fab}
         onPress={() => navigation.navigate("CreateMeal")}
       >
-        <Text style={styles.fabText}>＋</Text>
+        <Text style={styles.fabText}>＋ Meal Event</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 40, backgroundColor: "#fff" },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginTop: 5,
+  container: {
+    flex: 1,
+    padding: 16,
+    paddingBottom: 0,
+    backgroundColor: "#fff",
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.3,
+    lineHeight: 34,
+    color: "#1a1a1a",
+    marginVertical: 8,
   },
   tabsContainer: {
     flexDirection: "row",
@@ -203,11 +218,12 @@ const styles = StyleSheet.create({
     bottom: 24,
     right: 24,
     backgroundColor: "#007bff",
-    width: 56,
+    minWidth: 100,
     height: 56,
     borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -216,7 +232,7 @@ const styles = StyleSheet.create({
   },
   fabText: {
     color: "#fff",
-    fontSize: 30,
+    fontSize: 16,
     fontWeight: "bold",
   },
 });
