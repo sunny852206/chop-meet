@@ -5,13 +5,33 @@ import {
   FlatList,
   Pressable,
   Alert,
+  ScrollView,
+  Modal,
+  TouchableOpacity,
+  Button,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
+import { Ionicons } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { db, auth } from "../lib/firebase";
 import { onValue, ref, set } from "firebase/database";
 import type { Meal } from "../types/types";
+
+const VIBE_OPTIONS = [
+  { key: "quiet", label: "Quiet", emoji: "😌" },
+  { key: "cozy", label: "Cozy", emoji: "🛋️" },
+  { key: "chill", label: "Chill", emoji: "🌴" },
+  { key: "deep", label: "Deep Talk", emoji: "🧠" },
+  { key: "pet", label: "Pet Friendly", emoji: "🐶" },
+  { key: "vegan", label: "Vegan", emoji: "🥦" },
+  { key: "boba", label: "Just Boba", emoji: "🧋" },
+  { key: "foodie", label: "Food Lover", emoji: "🍣" },
+  { key: "talkative", label: "Chatty", emoji: "💬" },
+  { key: "fun", label: "Fun", emoji: "🎉" },
+  { key: "night", label: "Social Night", emoji: "🥂" },
+];
 
 // Utility Toast Function
 const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -30,7 +50,13 @@ export default function MealListScreen() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const navigation = useNavigation();
   const userId = auth.currentUser?.uid;
-
+  const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
+  const [vibeModalVisible, setVibeModalVisible] = useState(false);
+  const toggleVibe = (vibe: string) => {
+    setSelectedVibes((prev) =>
+      prev.includes(vibe) ? prev.filter((v) => v !== vibe) : [...prev, vibe]
+    );
+  };
   // listener for all meals
   useEffect(() => {
     const mealsRef = ref(db, "meals");
@@ -49,8 +75,13 @@ export default function MealListScreen() {
   }, []);
 
   // Filter meals based on current selected tab
-  const filteredMeals = meals.filter((meal) => meal.mealType === filter);
-
+  const filteredMeals = meals.filter((meal) => {
+    const matchesType = meal.mealType === filter;
+    const matchesVibe =
+      selectedVibes.length === 0 ||
+      selectedVibes.every((v) => meal.vibes?.includes(v));
+    return matchesType && matchesVibe;
+  });
   // Handles user joining or leaving a meal
   const handleJoinOrLeave = async (meal: Meal) => {
     if (!userId) {
@@ -110,9 +141,20 @@ export default function MealListScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🍴 Explore Meal Events</Text>
-
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Meal Events</Text>
+        <Pressable
+          style={[
+            styles.filterButton,
+            { flexDirection: "row", alignItems: "center" },
+          ]}
+          onPress={() => setVibeModalVisible(true)}
+        >
+          <Ionicons name="options-outline" size={20} color="gray" />
+          <Text style={{ marginLeft: 5, color: "#666" }}>Vibe</Text>
+        </Pressable>
+      </View>
       {/* Meal Type Tabs*/}
       <View style={styles.toggleContainer}>
         <Pressable
@@ -122,7 +164,8 @@ export default function MealListScreen() {
           ]}
           onPress={() => setFilter("Meal Buddy")}
         >
-          <Text>🍜 Meal Buddy</Text>
+          <Ionicons name="restaurant-outline" size={18} color="#555" />
+          <Text style={{ marginLeft: 6 }}>Meal Buddy</Text>
         </Pressable>
         <Pressable
           style={[
@@ -131,10 +174,54 @@ export default function MealListScreen() {
           ]}
           onPress={() => setFilter("Open to More")}
         >
-          <Text>❤️ Open to More</Text>
+          <Ionicons name="heart-outline" size={18} color="#555" />
+          <Text style={{ marginLeft: 6 }}>Open to More</Text>
         </Pressable>
       </View>
-
+      <Modal
+        visible={vibeModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setVibeModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Select Vibe</Text>
+            <ScrollView contentContainerStyle={styles.vibeOptionsContainer}>
+              {VIBE_OPTIONS.map((vibe) => (
+                <TouchableOpacity
+                  key={vibe.key}
+                  style={[
+                    styles.chip,
+                    selectedVibes.includes(vibe.key) && styles.chipSelected,
+                  ]}
+                  onPress={() => toggleVibe(vibe.key)}
+                >
+                  <Text>
+                    {vibe.emoji} {vibe.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <View style={styles.modalFooter}>
+              <Pressable
+                style={[styles.modalButton, { backgroundColor: "#ccc" }]}
+                onPress={() => setVibeModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalButton, { backgroundColor: "#3399ff" }]}
+                onPress={() => setVibeModalVisible(false)}
+              >
+                <Text style={[styles.modalButtonText, { color: "#fff" }]}>
+                  Apply
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
       {/* Filtered  Meal List */}
       <FlatList
         data={filteredMeals}
@@ -148,19 +235,49 @@ export default function MealListScreen() {
           const alreadyJoined = joined.includes(userId ?? "");
           return (
             <View style={styles.mealCard}>
-              <Text style={styles.mealTitle}>{item.title}</Text>
-              <Text>📍 {item.location}</Text>
-              <Text>
-                📅 {item.date} ⏰ {item.time}
-              </Text>
-              <Text>
-                💰 {item.budget} 🍽️ {item.cuisine}
-              </Text>
-              <Text>
-                👥 {joined.length} / {item.max} joined
-              </Text>
+              <View style={styles.cardHeader}>
+                <Text style={styles.mealTitle}>{item.title}</Text>
+                <Text style={styles.mealSubtitle}>
+                  {item.cuisine} · ${item.budget}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Ionicons
+                  name="location-outline"
+                  size={16}
+                  color="#555"
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={styles.mealMeta}>{item.location}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={16}
+                  color="#555"
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={styles.mealMeta}>{item.date}</Text>
+                <Ionicons
+                  name="time-outline"
+                  size={16}
+                  color="#555"
+                  style={{ marginLeft: 12, marginRight: 6 }}
+                />
+                <Text style={styles.mealMeta}>{item.time}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Ionicons
+                  name="people-outline"
+                  size={16}
+                  color="#555"
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={styles.mealMeta}>
+                  {joined.length} / {item.max} joined
+                </Text>
+              </View>
 
-              {/* Join/Leave Button */}
               <Pressable
                 style={[
                   styles.joinButton,
@@ -176,17 +293,24 @@ export default function MealListScreen() {
           );
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 40, backgroundColor: "#fff" },
+  container: {
+    flex: 1,
+    padding: 16,
+    paddingBottom: 0,
+    backgroundColor: "#fff",
+  },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginTop: 5,
-    marginBottom: 10,
+    fontSize: 28,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.3,
+    lineHeight: 34,
+    color: "#1a1a1a",
+    marginVertical: 8,
   },
   toggleContainer: {
     flexDirection: "row",
@@ -198,28 +322,48 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 20,
   },
   activeToggle: {
     backgroundColor: "#e0e0e0",
   },
   mealCard: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
+    backgroundColor: "#f9f9f9",
+    padding: 18,
+    borderRadius: 16,
+    marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#ddd",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  cardHeader: {
+    marginBottom: 6,
   },
   mealTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 4,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#222",
+  },
+  mealSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 2,
+  },
+  mealMeta: {
+    fontSize: 14,
+    color: "#444",
+    marginTop: 4,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
   },
   joinButton: {
     marginTop: 12,
@@ -236,5 +380,77 @@ const styles = StyleSheet.create({
   joinText: {
     color: "#fff",
     fontWeight: "600",
+  },
+  chip: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 20,
+    marginRight: 8,
+    backgroundColor: "#fff",
+  },
+  chipSelected: {
+    backgroundColor: "#cce5ff",
+    borderColor: "#3399ff",
+  },
+  filterButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
+    padding: 20,
+  },
+  modalContainer: {
+    backgroundColor: "#fefefe",
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 16,
+    color: "#222",
+    textAlign: "center",
+  },
+  vibeOptionsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 16,
+  },
+  modalFooter: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#222",
   },
 });
