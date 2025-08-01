@@ -17,21 +17,10 @@ import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { db, auth } from "../lib/firebase";
 import { onValue, ref, set } from "firebase/database";
-import type { Meal } from "../types/types";
 
-const VIBE_OPTIONS = [
-  { key: "quiet", label: "Quiet", emoji: "😌" },
-  { key: "cozy", label: "Cozy", emoji: "🛋️" },
-  { key: "chill", label: "Chill", emoji: "🌴" },
-  { key: "deep", label: "Deep Talk", emoji: "🧠" },
-  { key: "pet", label: "Pet Friendly", emoji: "🐶" },
-  { key: "vegan", label: "Vegan", emoji: "🥦" },
-  { key: "boba", label: "Just Boba", emoji: "🧋" },
-  { key: "foodie", label: "Food Lover", emoji: "🍣" },
-  { key: "talkative", label: "Chatty", emoji: "💬" },
-  { key: "fun", label: "Fun", emoji: "🎉" },
-  { key: "night", label: "Social Night", emoji: "🥂" },
-];
+import type { Meal } from "../types/types";
+import VibeSelectorModal from "../components/modals/VibeSelectorModal";
+import { VIBE_OPTIONS } from "../constants/vibeOptions";
 
 // Utility Toast Function
 const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -52,11 +41,7 @@ export default function MealListScreen() {
   const userId = auth.currentUser?.uid;
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [vibeModalVisible, setVibeModalVisible] = useState(false);
-  const toggleVibe = (vibe: string) => {
-    setSelectedVibes((prev) =>
-      prev.includes(vibe) ? prev.filter((v) => v !== vibe) : [...prev, vibe]
-    );
-  };
+
   // listener for all meals
   useEffect(() => {
     const mealsRef = ref(db, "meals");
@@ -77,6 +62,9 @@ export default function MealListScreen() {
   // Filter meals based on current selected tab
   const filteredMeals = meals.filter((meal) => {
     const matchesType = meal.mealType === filter;
+    // console.log("Checking meal:", meal.title);
+    // console.log("Meal Vibes:", meal.vibes);
+    // console.log("Selected Vibes:", selectedVibes);
     const matchesVibe =
       selectedVibes.length === 0 ||
       selectedVibes.every((v) => meal.vibes?.includes(v));
@@ -178,50 +166,15 @@ export default function MealListScreen() {
           <Text style={{ marginLeft: 6 }}>Open to More</Text>
         </Pressable>
       </View>
-      <Modal
+      <VibeSelectorModal
         visible={vibeModalVisible}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setVibeModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Select Vibe</Text>
-            <ScrollView contentContainerStyle={styles.vibeOptionsContainer}>
-              {VIBE_OPTIONS.map((vibe) => (
-                <TouchableOpacity
-                  key={vibe.key}
-                  style={[
-                    styles.chip,
-                    selectedVibes.includes(vibe.key) && styles.chipSelected,
-                  ]}
-                  onPress={() => toggleVibe(vibe.key)}
-                >
-                  <Text>
-                    {vibe.emoji} {vibe.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            <View style={styles.modalFooter}>
-              <Pressable
-                style={[styles.modalButton, { backgroundColor: "#ccc" }]}
-                onPress={() => setVibeModalVisible(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.modalButton, { backgroundColor: "#3399ff" }]}
-                onPress={() => setVibeModalVisible(false)}
-              >
-                <Text style={[styles.modalButtonText, { color: "#fff" }]}>
-                  Apply
-                </Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        selectedVibes={selectedVibes}
+        onClose={() => setVibeModalVisible(false)}
+        onToggle={(vibes) => {
+          console.log("✅ Applied vibes:", vibes);
+          setSelectedVibes(vibes);
+        }}
+      />
       {/* Filtered  Meal List */}
       <FlatList
         data={filteredMeals}
