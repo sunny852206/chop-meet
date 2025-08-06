@@ -235,10 +235,15 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: 12,
     backgroundColor: "#fafafa",
-    padding: 10,
+    padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#eee",
+    borderColor: "#ddd",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
   },
   sectionTitle: {
     fontSize: 18,

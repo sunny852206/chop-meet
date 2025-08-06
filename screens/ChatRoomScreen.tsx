@@ -7,6 +7,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { ref, onValue, push, update, get } from "firebase/database";
@@ -99,47 +100,51 @@ export default function ChatRoomScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={styles.container}
-    >
-      {/* Message List */}
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        keyExtractor={(item) => item.id || String(item.timestamp)}
-        renderItem={({ item }) => (
-          <View
-            style={[
-              styles.messageBubble,
-              item.senderId === userId ? styles.myMessage : styles.theirMessage,
-            ]}
-          >
-            <Text style={styles.sender}>
-              {item.senderId === userId ? "You" : item.senderName}
-            </Text>
-            <Text style={styles.text}>{item.text}</Text>
-          </View>
-        )}
-        onContentSizeChange={() =>
-          flatListRef.current?.scrollToEnd({ animated: true })
-        }
-        onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
-      />
-
-      {/* Input Row */}
-      <View style={styles.inputRow}>
-        <TextInput
-          value={input}
-          onChangeText={setInput}
-          placeholder="Type a message..."
-          style={styles.input}
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={styles.container}
+      >
+        {/* Message List */}
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          keyExtractor={(item) => item.id || String(item.timestamp)}
+          renderItem={({ item }) => (
+            <View
+              style={[
+                styles.messageBubble,
+                item.senderId === userId
+                  ? styles.myMessage
+                  : styles.theirMessage,
+              ]}
+            >
+              <Text style={styles.sender}>
+                {item.senderId === userId ? "You" : item.senderName}
+              </Text>
+              <Text style={styles.text}>{item.text}</Text>
+            </View>
+          )}
+          onContentSizeChange={() =>
+            flatListRef.current?.scrollToEnd({ animated: true })
+          }
+          onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
         />
-        <Pressable onPress={sendMessage} style={styles.sendBtn}>
-          <Text style={styles.sendText}>Send</Text>
-        </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+
+        {/* Input Row */}
+        <View style={styles.inputRow}>
+          <TextInput
+            value={input}
+            onChangeText={setInput}
+            placeholder="Type a message..."
+            style={styles.input}
+          />
+          <Pressable onPress={sendMessage} style={styles.sendBtn}>
+            <Text style={styles.sendText}>Send</Text>
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -168,11 +173,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   messageBubble: {
-    marginVertical: 6,
-    padding: 10,
+    marginVertical: 4,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     marginHorizontal: 12,
-    borderRadius: 8,
-    maxWidth: "75%",
+    borderRadius: 12,
+    maxWidth: "90%",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    elevation: 1,
+    shadowColor: "#000",
   },
   myMessage: {
     backgroundColor: "#dcf8c6",

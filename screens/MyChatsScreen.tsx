@@ -7,6 +7,8 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { ref, get } from "firebase/database";
 import { db, auth } from "../lib/firebase";
 import { useNavigation } from "@react-navigation/native";
@@ -84,9 +86,10 @@ export default function MyChatsScreen() {
   if (!userId) return null;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>💬 Your Meal Chats</Text>
-
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Meal Chats</Text>
+      </View>
       {loading && <ActivityIndicator size="small" />}
       {error && <Text style={styles.error}>{error}</Text>}
       {!loading && joinedMeals.length === 0 && (
@@ -130,25 +133,49 @@ export default function MyChatsScreen() {
           </Pressable>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 40, backgroundColor: "#fff" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 16 },
+  container: {
+    flex: 1,
+    padding: 16,
+    paddingBottom: 0,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.3,
+    lineHeight: 34,
+    color: "#1a1a1a",
+    marginVertical: 8,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
   error: { color: "red", marginBottom: 12 },
   empty: { textAlign: "center", marginTop: 20, color: "#888" },
   itemWrapper: { marginBottom: 12 },
   item: {
-    padding: 14,
+    backgroundColor: "#ffffff",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: "#eee",
     borderRadius: 8,
-    backgroundColor: "#fafafa",
+    borderColor: "#f2f2f2",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04, // very soft
+    shadowRadius: 2,
+    elevation: 0, // minimal shadow for flat iOS look
   },
   mealTitle: { fontSize: 16, fontWeight: "600" },
   meta: { color: "#555", marginTop: 4, fontSize: 13 },

@@ -51,8 +51,11 @@ export default function MyMealsScreen() {
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>{meal.title}</Text>
           {isCreator && (
-            <Pressable onPress={() => handleDeleteMeal(meal.id)}>
-              <Text style={styles.cardDelete}>🗑</Text>
+            <Pressable
+              onPress={() => handleDeleteMeal(meal.id)}
+              style={styles.cardDeleteIcon}
+            >
+              <Text style={{ fontSize: 16 }}>🗑</Text>
             </Pressable>
           )}
         </View>
@@ -108,7 +111,9 @@ export default function MyMealsScreen() {
             style={[styles.tab, selectedTab === tab && styles.activeTab]}
             onPress={() => setSelectedTab(tab)}
           >
-            <Text style={styles.tabText}>
+            <Text
+              style={[styles.tabText, selectedTab === tab && { color: "#fff" }]}
+            >
               {tab} (
               {tab === "All"
                 ? new Set([...createdMeals, ...joinedMeals].map((m) => m.id))
@@ -164,14 +169,16 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    backgroundColor: "#f1f1f1",
+    borderRadius: 20,
+    padding: 4,
     marginBottom: 16,
+    alignSelf: "center",
   },
   tab: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    backgroundColor: "#eee",
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 16,
   },
   activeTab: {
     backgroundColor: "#007aff",
@@ -184,12 +191,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 12,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
+    padding: 15,
+    borderRadius: 20,
+    marginVertical: 10,
+    marginHorizontal: 15,
+    borderWidth: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
+    position: "relative",
   },
   cardHeader: {
     flexDirection: "row",
@@ -198,11 +211,14 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
+    color: "#1a1a1a",
+    marginBottom: 4,
   },
-  cardDelete: {
-    fontSize: 16,
-    color: "#ff4d4f",
+  cardDeleteIcon: {
+    position: "absolute",
+    top: 12,
+    right: 12,
   },
   cardDetail: {
     marginTop: 4,
@@ -218,12 +234,12 @@ const styles = StyleSheet.create({
     bottom: 24,
     right: 24,
     backgroundColor: "#007bff",
-    minWidth: 100,
-    height: 56,
     borderRadius: 28,
+    paddingHorizontal: 20,
+    height: 56,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 16,
+    flexDirection: "row",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -233,6 +249,6 @@ const styles = StyleSheet.create({
   fabText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
 });
