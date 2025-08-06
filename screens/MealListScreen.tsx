@@ -144,27 +144,52 @@ export default function MealListScreen() {
         </Pressable>
       </View>
       {/* Meal Type Tabs*/}
-      <View style={styles.toggleContainer}>
-        <Pressable
-          style={[
-            styles.toggleButton,
-            filter === "Meal Buddy" && styles.activeToggle,
-          ]}
-          onPress={() => setFilter("Meal Buddy")}
-        >
-          <Ionicons name="restaurant-outline" size={18} color="#555" />
-          <Text style={{ marginLeft: 6 }}>Meal Buddy</Text>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.toggleButton,
-            filter === "Open to More" && styles.activeToggle,
-          ]}
-          onPress={() => setFilter("Open to More")}
-        >
-          <Ionicons name="heart-outline" size={18} color="#555" />
-          <Text style={{ marginLeft: 6 }}>Open to More</Text>
-        </Pressable>
+      <View style={styles.toggleWrapper}>
+        <View style={styles.toggleContainer}>
+          <Pressable
+            style={[
+              styles.toggleButton,
+              filter === "Meal Buddy" && styles.activeToggle,
+            ]}
+            onPress={() => setFilter("Meal Buddy")}
+          >
+            <Ionicons
+              name="restaurant-outline"
+              size={16}
+              color={filter === "Meal Buddy" ? "#fff" : "#555"}
+            />
+            <Text
+              style={[
+                styles.toggleText,
+                filter === "Meal Buddy" && styles.activeText,
+              ]}
+            >
+              Meal Buddy
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.toggleButton,
+              filter === "Open to More" && styles.activeToggle,
+            ]}
+            onPress={() => setFilter("Open to More")}
+          >
+            <Ionicons
+              name="heart-outline"
+              size={16}
+              color={filter === "Open to More" ? "#fff" : "#555"}
+            />
+            <Text
+              style={[
+                styles.toggleText,
+                filter === "Open to More" && styles.activeText,
+              ]}
+            >
+              Open to More
+            </Text>
+          </Pressable>
+        </View>
       </View>
       <VibeSelectorModal
         visible={vibeModalVisible}
@@ -265,58 +290,76 @@ const styles = StyleSheet.create({
     color: "#1a1a1a",
     marginVertical: 8,
   },
+  toggleWrapper: {
+    alignSelf: "center",
+    backgroundColor: "#f1f1f1",
+    padding: 4,
+    borderRadius: 999,
+    marginVertical: 12,
+  },
   toggleContainer: {
     flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 16,
-    gap: 10,
+    borderRadius: 999,
+    overflow: "hidden",
   },
   toggleButton: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    backgroundColor: "transparent",
   },
   activeToggle: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "#007aff",
+    borderRadius: 999,
+  },
+  toggleText: {
+    marginLeft: 6,
+    fontSize: 14,
+    color: "#555",
+  },
+  activeText: {
+    color: "#fff",
+    fontWeight: "600",
   },
   mealCard: {
-    backgroundColor: "#f9f9f9",
-    padding: 18,
-    borderRadius: 16,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: "#ddd",
+    backgroundColor: "#ffffff",
+    padding: 15,
+    borderRadius: 20,
+    marginVertical: 10,
+    marginHorizontal: 15,
+    borderWidth: 0,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowRadius: 12,
+    elevation: 6,
   },
   cardHeader: {
-    marginBottom: 6,
+    marginBottom: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   mealTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#222",
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#1a1a1a",
   },
   mealSubtitle: {
     fontSize: 14,
-    color: "#666",
+    color: "#888",
     marginTop: 2,
   },
   mealMeta: {
     fontSize: 14,
-    color: "#444",
-    marginTop: 4,
+    color: "#555",
   },
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 4,
+    marginTop: 6,
+    gap: 4,
   },
   joinButton: {
     marginTop: 12,
@@ -360,7 +403,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
   },
   modalOverlay: {
     flex: 1,
