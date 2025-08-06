@@ -5,15 +5,20 @@ import {
   Pressable,
   StyleSheet,
   Alert,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useState } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { db } from "../lib/firebase";
 import { ref, push } from "firebase/database";
 import { auth } from "../lib/firebase";
 
+import { VIBE_OPTIONS } from "../constants/vibeOptions";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList, Meal } from "../types/types";
+import VibeSelectorModal from "../components/modals/VibeSelectorModal";
 
 type Props = NativeStackScreenProps<RootStackParamList, "CreateMeal">;
 
@@ -29,6 +34,14 @@ export default function CreateMealScreen({ navigation }: Props) {
   const [cuisine, setCuisine] = useState("");
   const [people, setPeople] = useState("2");
   const [max, setMax] = useState("4");
+  const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
+  const [vibeModalVisible, setVibeModalVisible] = useState(false);
+
+  const toggleVibe = (key: string) => {
+    setSelectedVibes((prev) =>
+      prev.includes(key) ? prev.filter((v) => v !== key) : [...prev, key]
+    );
+  };
 
   const handleCreate = async () => {
     const userId = auth.currentUser?.uid;
@@ -54,6 +67,7 @@ export default function CreateMealScreen({ navigation }: Props) {
       max: Number(max),
       creatorId: userId,
       joinedIds: [userId],
+      vibes: selectedVibes,
     };
     try {
       const mealRef = ref(db, "meals");
@@ -68,93 +82,197 @@ export default function CreateMealScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Required Information</Text>
-      <TextInput
-        placeholder="Enter event title（Ex: Dollar Shop Hotpot）"
-        value={title}
-        onChangeText={setTitle}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Date (YYYY-MM-DD)"
-        value={date}
-        onChangeText={setDate}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Time (e.g. 18:30)"
-        value={time}
-        onChangeText={setTime}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Location"
-        value={location}
-        onChangeText={setLocation}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Cuisine"
-        value={cuisine}
-        onChangeText={setCuisine}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Budget ($)"
-        value={budget}
-        onChangeText={setBudget}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Max participants"
-        value={max}
-        onChangeText={setMax}
-        style={styles.input}
-        keyboardType="numeric"
-      />
-      {/* Meal Type Toggle */}
-      <View style={styles.toggleContainer}>
-        <Pressable
-          style={[
-            styles.toggleButton,
-            mealType === "Meal Buddy" && styles.activeToggle,
-          ]}
-          onPress={() => setMealType("Meal Buddy")}
-        >
-          <Text>🍜 Meal Buddy</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>🍽️ Meal Info</Text>
+          <Text style={styles.label}>
+            Title <Text style={styles.required}>*</Text>
+          </Text>
+          <TextInput
+            placeholder="Ex: Taco Tuesday"
+            value={title}
+            onChangeText={setTitle}
+            style={styles.input}
+          />
+          <Text style={styles.label}>Cuisine</Text>
+          <TextInput
+            placeholder="Ex: Mexican Fusion"
+            value={cuisine}
+            onChangeText={setCuisine}
+            style={styles.input}
+          />
+
+          <View style={styles.row}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>Budget ($)</Text>
+              <TextInput
+                placeholder="Ex: 20"
+                value={budget}
+                onChangeText={setBudget}
+                style={styles.input}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>Max Participants</Text>
+              <TextInput
+                placeholder="Ex: 4"
+                value={max}
+                onChangeText={setMax}
+                style={styles.input}
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
+          <View style={styles.toggleContainer}>
+            <Pressable
+              style={[
+                styles.toggleButton,
+                mealType === "Meal Buddy" && styles.activeToggle,
+              ]}
+              onPress={() => setMealType("Meal Buddy")}
+            >
+              <Text>🍜 Meal Buddy</Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.toggleButton,
+                mealType === "Open to More" && styles.activeToggle,
+              ]}
+              onPress={() => setMealType("Open to More")}
+            >
+              <Text>❤️ Open to More</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>📅 Schedule</Text>
+          <View style={styles.row}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>
+                Date <Text style={styles.required}>*</Text>
+              </Text>
+              <TextInput
+                placeholder="YYYY-MM-DD"
+                value={date}
+                onChangeText={setDate}
+                style={styles.input}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>
+                Time <Text style={styles.required}>*</Text>
+              </Text>
+              <TextInput
+                placeholder="Ex: 18:30"
+                value={time}
+                onChangeText={setTime}
+                style={styles.input}
+              />
+            </View>
+          </View>
+          <Text style={styles.label}>
+            Location <Text style={styles.required}>*</Text>
+          </Text>
+          <TextInput
+            placeholder="Ex: Downtown Taco House"
+            value={location}
+            onChangeText={setLocation}
+            style={styles.input}
+          />
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>🎯 Vibe</Text>
+          <Text style={styles.label}>Select Vibes</Text>
+          <Pressable
+            style={[styles.input, { justifyContent: "center" }]}
+            onPress={() => setVibeModalVisible(true)}
+          >
+            <Text>
+              {selectedVibes.length > 0
+                ? selectedVibes
+                    .map(
+                      (key) =>
+                        VIBE_OPTIONS.find((v) => v.key === key)?.emoji +
+                        " " +
+                        VIBE_OPTIONS.find((v) => v.key === key)?.label +
+                        " "
+                    )
+                    .join(", ")
+                : "Choose Vibes"}
+            </Text>
+          </Pressable>
+
+          <VibeSelectorModal
+            visible={vibeModalVisible}
+            selectedVibes={selectedVibes}
+            onToggle={(vibes) => setSelectedVibes(vibes)}
+            onClose={() => setVibeModalVisible(false)}
+          />
+        </View>
+
+        <Pressable style={styles.button} onPress={handleCreate}>
+          <Text style={styles.buttonText}>Submit</Text>
         </Pressable>
-        <Pressable
-          style={[
-            styles.toggleButton,
-            mealType === "Open to More" && styles.activeToggle,
-          ]}
-          onPress={() => setMealType("Open to More")}
-        >
-          <Text>❤️ Open to More</Text>
-        </Pressable>
-      </View>
-      <Pressable style={styles.button} onPress={handleCreate}>
-        <Text style={styles.buttonText}>Submit</Text>
-      </Pressable>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center" },
-  title: { fontWeight: "bold", marginBottom: 16 },
+  container: {
+    padding: 20,
+    paddingBottom: 60,
+  },
+  card: {
+    marginBottom: 12,
+    backgroundColor: "#fafafa",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginTop: 16,
+    marginBottom: 6,
+    color: "#333",
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: "500",
+    marginBottom: 2,
+    marginTop: 4,
+  },
+  required: {
+    color: "red",
+  },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 20,
+    borderColor: "#ddd",
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    marginBottom: 4,
   },
   toggleContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: 20,
+    marginVertical: 4,
   },
   toggleButton: {
     paddingVertical: 8,
@@ -168,9 +286,19 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#007aff",
-    padding: 14,
-    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 8,
     alignItems: "center",
+    marginTop: 16,
   },
-  buttonText: { color: "#fff", fontWeight: "600" },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+  },
 });

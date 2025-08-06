@@ -11,6 +11,7 @@ export type Meal = {
   max: number;
   creatorId: string;
   joinedIds: string[];
+  vibes: string[];
 };
 
 export type RootStackParamList = {

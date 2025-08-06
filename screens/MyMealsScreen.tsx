@@ -4,10 +4,10 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   Pressable,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { onValue, ref, remove } from "firebase/database";
 import { db, auth } from "../lib/firebase";
@@ -51,8 +51,11 @@ export default function MyMealsScreen() {
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>{meal.title}</Text>
           {isCreator && (
-            <Pressable onPress={() => handleDeleteMeal(meal.id)}>
-              <Text style={styles.cardDelete}>🗑</Text>
+            <Pressable
+              onPress={() => handleDeleteMeal(meal.id)}
+              style={styles.cardDeleteIcon}
+            >
+              <Text style={{ fontSize: 16 }}>🗑</Text>
             </Pressable>
           )}
         </View>
@@ -95,8 +98,10 @@ export default function MyMealsScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🍽️ My Meal Events</Text>
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>My Meal Events</Text>
+      </View>
 
       {/* Segmented Control Tabs */}
       <View style={styles.tabsContainer}>
@@ -106,7 +111,9 @@ export default function MyMealsScreen() {
             style={[styles.tab, selectedTab === tab && styles.activeTab]}
             onPress={() => setSelectedTab(tab)}
           >
-            <Text style={styles.tabText}>
+            <Text
+              style={[styles.tabText, selectedTab === tab && { color: "#fff" }]}
+            >
               {tab} (
               {tab === "All"
                 ? new Set([...createdMeals, ...joinedMeals].map((m) => m.id))
@@ -128,35 +135,50 @@ export default function MyMealsScreen() {
         )}
       </ScrollView>
 
-      {/* Create New Meal */}
+      {/* Create New Meal Event*/}
       <Pressable
         style={styles.fab}
         onPress={() => navigation.navigate("CreateMeal")}
       >
-        <Text style={styles.fabText}>＋</Text>
+        <Text style={styles.fabText}>＋ Meal Event</Text>
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 40, backgroundColor: "#fff" },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginTop: 5,
+  container: {
+    flex: 1,
+    padding: 16,
+    paddingBottom: 0,
+    backgroundColor: "#fff",
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.3,
+    lineHeight: 34,
+    color: "#1a1a1a",
+    marginVertical: 8,
   },
   tabsContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    backgroundColor: "#f1f1f1",
+    borderRadius: 20,
+    padding: 4,
     marginBottom: 16,
+    alignSelf: "center",
   },
   tab: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    backgroundColor: "#eee",
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 16,
   },
   activeTab: {
     backgroundColor: "#007aff",
@@ -169,12 +191,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 12,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
+    padding: 15,
+    borderRadius: 20,
+    marginVertical: 10,
+    marginHorizontal: 15,
+    borderWidth: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
+    position: "relative",
   },
   cardHeader: {
     flexDirection: "row",
@@ -183,11 +211,14 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
+    color: "#1a1a1a",
+    marginBottom: 4,
   },
-  cardDelete: {
-    fontSize: 16,
-    color: "#ff4d4f",
+  cardDeleteIcon: {
+    position: "absolute",
+    top: 12,
+    right: 12,
   },
   cardDetail: {
     marginTop: 4,
@@ -203,11 +234,12 @@ const styles = StyleSheet.create({
     bottom: 24,
     right: 24,
     backgroundColor: "#007bff",
-    width: 56,
-    height: 56,
     borderRadius: 28,
+    paddingHorizontal: 20,
+    height: 56,
     justifyContent: "center",
     alignItems: "center",
+    flexDirection: "row",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -216,7 +248,7 @@ const styles = StyleSheet.create({
   },
   fabText: {
     color: "#fff",
-    fontSize: 30,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
